@@ -13,21 +13,27 @@ interface LineChartProps {
   }[];
   title: string;
   metric: keyof TraceDataAnalysis;
+  isClickable?: boolean;
 }
 
-function LineChart({ data, title, metric }: LineChartProps): JSX.Element {
+function LineChart({
+  data,
+  title,
+  metric,
+  isClickable = false,
+}: LineChartProps): JSX.Element {
   const ref = useRef();
   const navigate = useNavigate();
 
   const dates = data.map((item) => new Date(item.date).toLocaleDateString());
-  const avgScores = data.map((item) => item.value);
+  const scores = data.map((item) => item.value);
 
   const chartData = {
     labels: dates,
     datasets: [
       {
         label: 'Average Score over Time',
-        data: avgScores,
+        data: scores,
         borderColor: 'rgba(75,192,192,0.2)',
         backgroundColor: 'rgb(75,192,192)',
       },
@@ -37,7 +43,7 @@ function LineChart({ data, title, metric }: LineChartProps): JSX.Element {
   const options = {
     responsive: true,
     onClick: function (evt: any, element: any) {
-      if (element.length > 0) {
+      if (isClickable && element.length > 0) {
         const dataIndex = element[0].index;
         const clickedData = data[dataIndex];
         navigate(`${metric}/${clickedData._id}`);
