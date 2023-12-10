@@ -89,14 +89,14 @@ export interface TraceDataAnalysis extends Document {
   traceDepth?: TraceScores;
   traceBreadth?: TraceScores;
   // Completeness
-  missingActivity?: TraceScores;
+  missingActivity?: number;
   missingProperties?: TraceScores;
   // Consistency
   mixedGranulartiyOfTraces?: TraceScores;
   format?: TraceScores;
   timestampFormat?: TraceScores;
   // Uniqueness
-  duplicatesWithinTrace?: TraceScores;
+  duplicatesWithinTrace?: number;
 }
 
 export interface TraceScores {

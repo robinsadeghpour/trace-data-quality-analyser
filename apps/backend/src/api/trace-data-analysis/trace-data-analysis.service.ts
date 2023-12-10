@@ -30,7 +30,7 @@ export class TraceDataAnalysisService {
         this.traceDataMetricsService.calculateInfrequentEventOrdering(
           traceData
         ),
-      precision: this.traceDataMetricsService.calculatePrecision(traceData),
+      // precision: this.traceDataMetricsService.calculatePrecision(traceData),
       missingActivity:
         this.traceDataMetricsService.calculateMissingActivity(traceData),
       missingProperties:

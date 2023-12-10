@@ -8,7 +8,7 @@ export class TraceDataAnalysisEntity
   implements TraceDataAnalysis
 {
   @Column()
-  public duplicatesWithinTrace: TraceScores;
+  public duplicatesWithinTrace: number;
 
   @Column()
   public format: TraceScores;
@@ -20,7 +20,7 @@ export class TraceDataAnalysisEntity
   public infrequentEventOrdering: TraceScores;
 
   @Column()
-  public missingActivity: TraceScores;
+  public missingActivity: number;
 
   @Column()
   public missingProperties: TraceScores;

@@ -6,8 +6,8 @@ export class TraceDataAnalysisDto
   extends DocumentDto
   implements TraceDataAnalysis
 {
-  @ApiPropertyOptional({ type: () => Object })
-  public duplicatesWithinTrace?: TraceScores;
+  @ApiPropertyOptional({ type: () => Number })
+  public duplicatesWithinTrace?: number;
 
   @ApiPropertyOptional({ type: () => Object })
   public format: TraceScores;
@@ -18,8 +18,8 @@ export class TraceDataAnalysisDto
   @ApiPropertyOptional({ type: () => Object })
   public infrequentEventOrdering: TraceScores;
 
-  @ApiPropertyOptional({ type: () => Object })
-  public missingActivity: TraceScores;
+  @ApiPropertyOptional({ type: () => Number })
+  public missingActivity: number;
 
   @ApiPropertyOptional({ type: () => Object })
   public missingProperties: TraceScores;
