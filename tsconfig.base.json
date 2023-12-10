@@ -1,20 +1,23 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
+    "baseUrl": ".",
     "declaration": false,
-    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
+    "lib": ["es2017", "dom"],
     "module": "esnext",
-    "lib": ["es2020", "dom"],
-    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "paths": {
+      "@tdqa/types": ["libs/types/src/index.ts"]
+    },
+    "rootDir": ".",
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {}
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "target": "es2015"
   },
   "exclude": ["node_modules", "tmp"]
 }
