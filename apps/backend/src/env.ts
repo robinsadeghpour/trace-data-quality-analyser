@@ -14,4 +14,5 @@ export const env = {
   SESSION_SECRET: process.env.NX_SESSION_SECRET!,
   GOOGLE_CLIENT_ID: process.env.NX_GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_KEY: process.env.NX_GOOGLE_CLIENT_KEY,
+  LOOPS_API_KEY: process.env.NX_LOOPS_API_KEY,
 };

@@ -15,7 +15,7 @@ export class ThresholdService {
   private readonly repository: MongoRepository<TraceDataAnalysisEntity>;
 
   private logger = new Logger('ThresholdService');
-  private readonly THRESHOLD = 10; // Threshold in percentage
+  private readonly THRESHOLD = 10;
 
   public async checkThresholds(
     newData: Partial<TraceDataAnalysis>

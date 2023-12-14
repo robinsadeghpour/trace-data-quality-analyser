@@ -16,7 +16,9 @@ export class TraceDataAnalysisService {
 
   private logger = new Logger('TraceDataAnalysisService');
 
-  public async runTraceDataAnalysis(traceData: Trace[]): Promise<void> {
+  public async runTraceDataAnalysis(
+    traceData: Trace[]
+  ): Promise<TraceDataAnalysis> {
     this.logger.log('[runTraceDataAnalysis] Analyzing trace data...');
 
     const traceDataAnalysis: Partial<TraceDataAnalysis> = {
@@ -42,7 +44,8 @@ export class TraceDataAnalysisService {
     );
 
     const traceDataAnalysisEntity = this.repository.create(traceDataAnalysis);
-    this.repository.save(traceDataAnalysisEntity);
+
+    return this.repository.save(traceDataAnalysisEntity);
   }
 
   public async getTraceDataAnalysis(): Promise<TraceDataAnalysis[]> {

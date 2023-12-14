@@ -9,18 +9,18 @@ export class UserEmailService {
   @InjectRepository(UserEmailEntity)
   private readonly repository: MongoRepository<UserEmailEntity>;
 
-  public async getSetting(): Promise<UserEmail[]> {
+  public async getUserEmails(): Promise<UserEmail[]> {
     return this.repository.find();
   }
 
-  public async createSetting(data: UserEmail): Promise<UserEmail> {
+  public async createUserEmail(data: UserEmail): Promise<UserEmail> {
     const userMail = this.repository.create(data);
     await this.repository.save(userMail);
 
     return userMail;
   }
 
-  public async deleteSettingById(id: string): Promise<DeleteResult> {
+  public async deleteUserEmailById(id: string): Promise<DeleteResult> {
     const result = await this.repository.delete(id);
 
     if (!result.affected) {

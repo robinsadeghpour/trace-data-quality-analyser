@@ -23,7 +23,7 @@ export class UserEmailController {
   @ApiOperation({ summary: 'Get all settings' })
   @ApiOkResponse({ type: UserEmailDto, isArray: true })
   public async getUserMails(): Promise<UserEmail[]> {
-    return this.settingService.getSetting();
+    return this.settingService.getUserEmails();
   }
 
   @Post()
@@ -31,7 +31,7 @@ export class UserEmailController {
   @ApiCreatedResponse({ type: UserEmailDto })
   @ApiBadRequestResponse({ type: ErrorDto })
   public async createUserMail(@Body() body: UserEmailDto): Promise<UserEmail> {
-    return this.settingService.createSetting(body);
+    return this.settingService.createUserEmail(body);
   }
 
   @Delete(':id')
@@ -41,6 +41,6 @@ export class UserEmailController {
   public async deleteUserMailById(
     @Param('id') id: string
   ): Promise<DeleteResult> {
-    return this.settingService.deleteSettingById(id);
+    return this.settingService.deleteUserEmailById(id);
   }
 }
