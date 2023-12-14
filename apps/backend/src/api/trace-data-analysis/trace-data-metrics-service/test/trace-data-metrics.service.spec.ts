@@ -1,4 +1,4 @@
-import { Index } from '../index';
+import { TraceDataMetricsService } from '../trace-data-metrics.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   getDuplicatesWithinTraceDataProvider,
@@ -12,15 +12,15 @@ import {
 import { Span } from '@tdqa/types';
 
 describe('TraceDataMetricsService', () => {
-  let underTest: Index;
+  let underTest: TraceDataMetricsService;
   let dateNowSpy;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [Index],
+      providers: [TraceDataMetricsService],
     }).compile();
 
-    underTest = module.get<Index>(Index);
+    underTest = module.get<TraceDataMetricsService>(TraceDataMetricsService);
   });
 
   afterAll(() => {

@@ -4,18 +4,17 @@ import { DeleteResult, MongoRepository } from 'typeorm';
 import { TraceDataAnalysisEntity } from './trace-data-analysis.entity';
 import { Trace, TraceDataAnalysis } from '@tdqa/types';
 import { ObjectId } from 'mongodb';
-import { Index } from './trace-data-metrics-service';
+import { TraceDataMetricsService } from './trace-data-metrics-service/trace-data-metrics.service';
 
 @Injectable()
 export class TraceDataAnalysisService {
   @InjectRepository(TraceDataAnalysisEntity)
   private readonly repository: MongoRepository<TraceDataAnalysisEntity>;
 
-  @Inject(Index)
-  private readonly traceDataMetricsService: Index;
+  @Inject(TraceDataMetricsService)
+  private readonly traceDataMetricsService: TraceDataMetricsService;
 
   private logger = new Logger('TraceDataAnalysisService');
-  private readonly THRESHOLD = 0.1;
 
   public async runTraceDataAnalysis(traceData: Trace[]): Promise<void> {
     this.logger.log('[runTraceDataAnalysis] Analyzing trace data...');
@@ -103,36 +102,5 @@ export class TraceDataAnalysisService {
     }
 
     return result;
-  }
-
-  private async checkThresholds(
-    newData: Partial<TraceDataAnalysis>
-  ): Promise<void> {
-    const previousData = await this.repository.findOne({
-      order: { timestamp: 'DESC' },
-    });
-
-    if (!previousData) {
-      return;
-    }
-
-    for (const metric in newData) {
-      if (newData[metric] && previousData[metric]) {
-        const difference = Math.abs(
-          newData[metric].avgScore - previousData[metric].avgScore
-        );
-
-        if (difference > this.THRESHOLD) {
-          this.logger.log(
-            '[checkThresholds] threshold exceeded for ',
-            metric,
-            'by',
-            difference
-          );
-          // TODO notify user
-          // TODO: Add code to display in frontend
-        }
-      }
-    }
   }
 }

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Trace, TraceScore, TraceScores } from '@tdqa/types';
 
 @Injectable()
-export class Index {
+export class TraceDataMetricsService {
   private logger = new Logger('TraceDataService');
 
   // public calculatePrecision(traces: Trace[]): TraceScores {
