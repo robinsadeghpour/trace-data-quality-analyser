@@ -6,7 +6,7 @@ import {
   getInfrequentEventOrderingDataProvider,
   getMissingActivityDataProvider,
   getMissingPropertiesDataProvider,
-  getSpanTimeCoverageDataProvider,
+  getSpanTimeCoverageDataProvider, getTraceBreadthDataProvider, getTraceDepthDataProvider,
   TraceDataProvider,
 } from './trace-data-metrics.data-provider';
 import { Span } from '@tdqa/types';
@@ -98,6 +98,30 @@ describe('TraceDataMetricsService', () => {
           { id: '', spans: spans as Span[] },
         ]);
         expect(result).toBe(expectedScore);
+      });
+    }
+  );
+
+  describe.each(getTraceDepthDataProvider())(
+    'Trace Depth',
+    ({ spans, expectedScore }: TraceDataProvider) => {
+      it(`should calculate the correct score for given spans`, () => {
+        const result = underTest.calculateTraceDepth([
+          { id: '', spans: spans as Span[] },
+        ]);
+        expect(result.avgScore).toBe(expectedScore);
+      });
+    }
+  );
+
+  describe.each(getTraceBreadthDataProvider())(
+    'Trace Breadth',
+    ({ spans, expectedScore }: TraceDataProvider) => {
+      it(`should calculate the correct score for given spans`, () => {
+        const result = underTest.calculateTraceBreadth([
+          { id: '', spans: spans as Span[] },
+        ]);
+        expect(result.avgScore).toBe(expectedScore);
       });
     }
   );

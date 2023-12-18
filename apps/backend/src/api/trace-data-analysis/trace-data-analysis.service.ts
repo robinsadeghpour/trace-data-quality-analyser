@@ -36,6 +36,8 @@ export class TraceDataAnalysisService {
         this.traceDataMetricsService.calculateMissingActivity(traceData),
       missingProperties:
         this.traceDataMetricsService.calculateMissingProperties(traceData),
+      traceBreadth: this.traceDataMetricsService.calculateTraceBreadth(traceData),
+      traceDepth: this.traceDataMetricsService.calculateTraceDepth(traceData),
     };
 
     this.logger.log('[runTraceDataAnalysis] Trace Data Analysis done');

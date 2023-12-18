@@ -536,3 +536,67 @@ export const getMissingActivityDataProvider = (): TraceDataProvider[] => {
 //     // },
 //   ];
 // };
+
+export const getTraceDepthDataProvider = (): TraceDataProvider[] => {
+  return [
+    {
+      // Simple trace with no nested spans
+      spans: [
+        { spanId: 'a', timestamp: new Date() },
+        { spanId: 'b', timestamp: new Date(), parentSpanId: 'a' },
+      ],
+      expectedScore: 2, // Depth of 2 (span 'a' and its child 'b')
+    },
+    {
+      // Trace with multiple levels of nesting
+      spans: [
+        { spanId: 'a', timestamp: new Date() },
+        { spanId: 'b', timestamp: new Date(), parentSpanId: 'a' },
+        { spanId: 'c', timestamp: new Date(), parentSpanId: 'b' },
+      ],
+      expectedScore: 3, // Depth of 3 (span 'a', 'b', and 'c')
+    },
+    {
+      // Trace with multiple branches but same maximum depth
+      spans: [
+        { spanId: 'a', timestamp: new Date() },
+        { spanId: 'b', timestamp: new Date(), parentSpanId: 'a' },
+        { spanId: 'c', timestamp: new Date(), parentSpanId: 'a' },
+        { spanId: 'd', timestamp: new Date(), parentSpanId: 'b' },
+      ],
+      expectedScore: 3, // Depth of 3 (span 'a', 'b', and 'd')
+    },
+  ];
+};
+
+export const getTraceBreadthDataProvider = (): TraceDataProvider[] => {
+  return [
+    {
+      // Trace with spans from two unique services
+      spans: [
+        { spanId: 'a', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
+        { spanId: 'b', timestamp: new Date(), resource: { service: {name: 'ServiceB'} } },
+      ],
+      expectedScore: 2,
+    },
+    {
+      // Trace with spans from three unique services
+      spans: [
+        { spanId: 'a', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
+        { spanId: 'b', timestamp: new Date(), resource: { service: {name: 'ServiceB'} } },
+        { spanId: 'c', timestamp: new Date(), resource: { service: {name: 'ServiceC'} } },
+      ],
+      expectedScore: 3, // Three unique services
+    },
+    {
+      // Trace with multiple spans from the same service
+      spans: [
+        { spanId: 'a', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
+        { spanId: 'b', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
+        { spanId: 'c', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
+      ],
+      expectedScore: 1, // One unique service
+    },
+  ];
+};
+

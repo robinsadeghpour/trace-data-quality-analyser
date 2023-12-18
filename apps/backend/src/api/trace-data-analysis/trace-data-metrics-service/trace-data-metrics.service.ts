@@ -260,6 +260,53 @@ export class TraceDataMetricsService {
   //   return 6;
   // }
 
+  public calculateTraceDepth(traces: Trace[]): TraceScores {
+    const scores: TraceScore[] = [];
+
+    traces.forEach((trace) => {
+      let maxDepth = 0;
+      const depthMap = new Map<string, number>();
+
+      trace.spans.forEach((span) => {
+        const parentDepth = span.parentSpanId ? depthMap.get(span.parentSpanId) || 0 : 0;
+        const currentDepth = parentDepth + 1;
+        depthMap.set(span.spanId, currentDepth);
+        maxDepth = Math.max(maxDepth, currentDepth);
+      });
+
+      scores.push({ traceId: trace.id, score: maxDepth });
+    });
+
+    const avgDepth = scores.reduce((acc, curr) => acc + curr.score, 0) / traces.length;
+
+    return {
+      avgScore: avgDepth,
+      scores: scores,
+    };
+  }
+
+  public calculateTraceBreadth(traces: Trace[]): TraceScores {
+    const scores: TraceScore[] = [];
+
+    traces.forEach((trace) => {
+      const uniqueServices = new Set<string>();
+      trace.spans.forEach((span) => {
+        uniqueServices.add(span.resource.service.name);
+      });
+
+      scores.push({ traceId: trace.id, score: uniqueServices.size });
+    });
+
+    const avgBreadth = scores.reduce((acc, curr) => acc + curr.score, 0) / traces.length;
+
+    return {
+      avgScore: avgBreadth,
+      scores: scores,
+    };
+  }
+
+
+
   private calculateAverageScore(
     totalScore: number,
     numberOfTraces: number

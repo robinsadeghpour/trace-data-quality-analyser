@@ -66,9 +66,9 @@ export interface Resource {
       id?: string;
     };
     name: string;
-    namespace: string;
+    namespace?: string;
   };
-  telemetry: {
+  telemetry?: {
     auto?: {
       version?: string;
     };
