@@ -38,10 +38,7 @@ export class TraceDataAnalysisService {
         this.traceDataMetricsService.calculateMissingProperties(traceData),
     };
 
-    this.logger.log(
-      '[runTraceDataAnalysis] Trace Data Analysis done:',
-      traceDataAnalysis
-    );
+    this.logger.log('[runTraceDataAnalysis] Trace Data Analysis done');
 
     const traceDataAnalysisEntity = this.repository.create(traceDataAnalysis);
 
@@ -55,10 +52,10 @@ export class TraceDataAnalysisService {
         'created_at',
         'updated_at',
         'timestamp',
-        'duplicatesWithinTrace.avgScore',
+        'duplicatesWithinTrace',
         'format.avgScore',
         'infrequentEventOrdering.avgScore',
-        'missingActivity.avgScore',
+        'missingActivity',
         'missingProperties.avgScore',
         'mixedGranulartiyOfTraces.avgScore',
         'precision.avgScore',

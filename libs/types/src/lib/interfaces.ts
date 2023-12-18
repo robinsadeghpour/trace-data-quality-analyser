@@ -117,3 +117,15 @@ export interface Settings {
   emais: UserEmail[];
   threshold: number;
 }
+
+export interface DockerComposeService {
+  serviceName: string;
+  containerName: string;
+  exposedPorts: string[];
+  hostnames?: string;
+}
+
+export interface DockerComposeAnalysis {
+  serviceCount: number;
+  services: DockerComposeService[];
+}

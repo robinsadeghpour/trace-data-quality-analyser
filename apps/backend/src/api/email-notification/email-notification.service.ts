@@ -1,4 +1,4 @@
-import { ThresholdOverrun } from './threshold-service';
+import { ThresholdOverrun } from '../trace-data-analysis/threshold-service';
 
 export interface IEmailNotificationService {
   sendThresholdOverrunEmail(

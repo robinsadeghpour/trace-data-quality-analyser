@@ -8,6 +8,6 @@ import { UserEmailEntity } from './user-email.entity';
   imports: [TypeOrmModule.forFeature([UserEmailEntity])],
   controllers: [UserEmailController],
   providers: [UserEmailService],
-  exports: [],
+  exports: [UserEmailService],
 })
 export class UserEmailModule {}

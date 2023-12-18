@@ -8,6 +8,8 @@ import { DataSourceModule } from '../api/data-source/data-source.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TraceDataAnalysisModule } from '../api/trace-data-analysis/trace-data-analysis.module';
 import { UserEmailModule } from '../api/user-email/user-email.module';
+import { GitClientModule } from '../api/git-client/git-client.module';
+import { EmailNotificationModule } from '../api/email-notification/email-notification.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { UserEmailModule } from '../api/user-email/user-email.module';
       exclude: ['/api/(.*)'],
     }),
     ScheduleModule.forRoot(),
+    GitClientModule,
+    EmailNotificationModule,
     DataSourceModule,
     TraceDataAnalysisModule,
     UserEmailModule,

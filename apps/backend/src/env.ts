@@ -15,4 +15,7 @@ export const env = {
   GOOGLE_CLIENT_ID: process.env.NX_GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_KEY: process.env.NX_GOOGLE_CLIENT_KEY,
   LOOPS_API_KEY: process.env.NX_LOOPS_API_KEY,
+  GITHUB_TOKEN: process.env.NX_GITHUB_TOKEN,
+  GITHUB_REPO: process.env.NX_GITHUB_REPO,
+  GITHUB_OWNER: process.env.NX_GITHUB_OWNER,
 };

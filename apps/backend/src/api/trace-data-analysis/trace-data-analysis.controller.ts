@@ -22,14 +22,14 @@ import { TraceDataAnalysis } from '@tdqa/types';
 import { DeleteResult } from 'typeorm';
 
 @ApiTags('analysis')
-@Controller('data-source/analysis')
+@Controller('trace-data/analysis')
 export class TraceDataAnalysisController {
   public constructor(
     private readonly traceDataAnalysisService: TraceDataAnalysisService
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all data-source-analysis' })
+  @ApiOperation({ summary: 'Get all trace-data-analysis' })
   @ApiOkResponse({ type: TraceDataAnalysisDto, isArray: true })
   @ApiQuery({
     name: 'select',
@@ -42,11 +42,12 @@ export class TraceDataAnalysisController {
     description: 'Filter by status',
   })
   public async getTraceDataAnalysis(): Promise<TraceDataAnalysis[]> {
+    console.log("getTraceDataAnalysis")
     return this.traceDataAnalysisService.getTraceDataAnalysis();
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a data-source-analysis by id' })
+  @ApiOperation({ summary: 'Delete a trace-data-analysis by id' })
   @ApiOkResponse({ type: DeleteResult })
   @ApiNotFoundResponse({ type: ErrorDto })
   public async deleteTraceDataAnalysisById(
@@ -56,7 +57,7 @@ export class TraceDataAnalysisController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a data-source-analysis by id' })
+  @ApiOperation({ summary: 'Get a trace-data-analysis by id' })
   @ApiOkResponse({ type: TraceDataAnalysisDto })
   @ApiNotFoundResponse({ type: ErrorDto })
   public async getTraceDataAnalysisById(

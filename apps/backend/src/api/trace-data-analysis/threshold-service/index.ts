@@ -15,7 +15,7 @@ export class ThresholdService {
   private readonly repository: MongoRepository<TraceDataAnalysisEntity>;
 
   private logger = new Logger('ThresholdService');
-  private readonly THRESHOLD = 10;
+  private readonly THRESHOLD = 0.001;
 
   public async checkThresholds(
     newData: Partial<TraceDataAnalysis>
@@ -31,6 +31,8 @@ export class ThresholdService {
     }
 
     for (const metric in newData) {
+      this.logger.log('[checkThresholds] Checking metric', metric);
+
       if (newData[metric] && previousData[metric]) {
         const newValue = newData[metric].avgScore
           ? newData[metric].avgScore

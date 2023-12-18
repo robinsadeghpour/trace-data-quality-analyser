@@ -2,7 +2,7 @@ import { Column, Entity } from 'typeorm';
 import { DocumentEntity } from '../../database/document.entity';
 import { TraceDataAnalysis, TraceScores } from '@tdqa/types';
 
-@Entity('data-source-analysis-report')
+@Entity('trace-data-analysis-report')
 export class TraceDataAnalysisEntity
   extends DocumentEntity
   implements TraceDataAnalysis

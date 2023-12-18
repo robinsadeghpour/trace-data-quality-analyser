@@ -201,8 +201,6 @@ export class TraceDataMetricsService {
       trace.spans.find((span) => !span.parentSpanId) ?? trace.spans[0];
 
     if (trace.spans.length === 1) {
-      this.logger.log('[calculateSTC] Trace has only one span. STC is 100%.');
-
       return 100;
     }
 

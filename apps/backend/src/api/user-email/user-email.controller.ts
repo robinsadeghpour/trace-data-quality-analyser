@@ -14,13 +14,13 @@ import { UserEmailService } from './user-email.service';
 import { UserEmail } from '@tdqa/types';
 import { DeleteResult } from 'typeorm';
 
-@ApiTags('settings')
-@Controller('settings')
+@ApiTags('userEmail')
+@Controller('userEmail')
 export class UserEmailController {
   public constructor(private readonly settingService: UserEmailService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all settings' })
+  @ApiOperation({ summary: 'Get all userEmail' })
   @ApiOkResponse({ type: UserEmailDto, isArray: true })
   public async getUserMails(): Promise<UserEmail[]> {
     return this.settingService.getUserEmails();
