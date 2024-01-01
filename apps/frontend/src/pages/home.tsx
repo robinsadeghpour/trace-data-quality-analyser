@@ -1,7 +1,12 @@
 import { Grid } from '@chakra-ui/react';
-import { useTraceDataAnalysis } from '../services/trace-data-analysis.service';
+import {
+  useServiceInfos,
+  useTraceDataAnalysis,
+} from '../services/trace-data-analysis.service';
 import LineChart from '../components/Chart/LineChart';
 import { TraceDataAnalysis, TraceScores } from '@tdqa/types';
+import CurrentTraceBreadthAndDepthOverview from '../components/Chart/CurrentTraceBreadthAndDepthOverview';
+import { ReactElement } from 'react';
 
 const traceDataProperties: {
   key: string;
@@ -16,9 +21,6 @@ const traceDataProperties: {
     isClickable: true,
   },
   // { key: 'precision', title: 'Precision', isClickable: true },
-  // TODO
-  // { key: 'traceDepth', title: 'Trace Depth', isClickable: true },
-  // { key: 'traceBreadth', title: 'Trace Breadth', isClickable: true },
   { key: 'missingActivity', title: 'Missing Activity', isClickable: false },
   { key: 'missingProperties', title: 'Missing Properties', isClickable: true },
   {
@@ -31,14 +33,34 @@ const traceDataProperties: {
     title: 'Duplicates Within Trace',
     isClickable: false,
   },
+  {
+    key: 'traceBreadth',
+    title: 'Trace Breadth',
+    isClickable: true,
+  },
+  {
+    key: 'traceDepth',
+    title: 'Trace Breadth',
+    isClickable: true,
+  },
 ];
 
 function instanceOfTraceScores(object: any): object is TraceScores {
   return typeof object === 'object' && object !== null && 'avgScore' in object;
 }
 
-const HomePage = (): JSX.Element => {
-  const { data } = useTraceDataAnalysis();
+const HomePage = (): ReactElement => {
+  const { data: traceDataAnalysis } = useTraceDataAnalysis();
+  const { data: serviceInfos } = useServiceInfos();
+
+  const sortedTraceDataAnalysis = [...(traceDataAnalysis ?? [])].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+
+  const currentTraceBreadth =
+    sortedTraceDataAnalysis?.[0]?.traceBreadth?.avgScore ?? 0;
+  const currentTraceDepth =
+    sortedTraceDataAnalysis?.[0]?.traceDepth?.avgScore ?? 0;
 
   return (
     <Grid
@@ -49,6 +71,13 @@ const HomePage = (): JSX.Element => {
       templateColumns="repeat(2, 1fr)"
       gap={4}
     >
+      {serviceInfos && (
+        <CurrentTraceBreadthAndDepthOverview
+          traceBreadth={currentTraceBreadth}
+          traceDepth={currentTraceDepth}
+          serviceInfos={serviceInfos}
+        />
+      )}
       {traceDataProperties.map((prop) => (
         <LineChart
           key={Math.random()}
@@ -56,7 +85,7 @@ const HomePage = (): JSX.Element => {
           metric={prop.key as keyof TraceDataAnalysis}
           isClickable={prop.isClickable}
           data={
-            data?.map((analysis) => {
+            traceDataAnalysis?.map((analysis) => {
               const property = analysis[prop.key as keyof typeof analysis];
               const value = instanceOfTraceScores(property)
                 ? property.avgScore

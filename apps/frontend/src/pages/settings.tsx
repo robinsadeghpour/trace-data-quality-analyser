@@ -16,7 +16,7 @@ import {
   useAddUserMail,
   useDeleteUserMail,
   useUserMails,
-} from '../services/settings.service';
+} from '../services/user-email.service';
 import { UserEmail, RequestBody } from '@tdqa/types';
 import { useNavigate } from 'react-router-dom';
 

@@ -196,6 +196,83 @@ export class TraceDataMetricsService {
     };
   }
 
+  // private getMoreGranularUnits(date: Date): number {
+
+  //   if (date.getMilliseconds() !== 0) {
+  //     return 0;
+  //   }
+  //
+  //   if (date.getSeconds() !== 0) {
+  //     return 1;
+  //   }
+  //
+  //   if (date.getMinutes() !== 0) {
+  //     return 2;
+  //   }
+  //
+  //   if (date.getHours() !== 0) {
+  //     return 3;
+  //   }
+  //
+  //   if (date.getDate() !== 0) {
+  //     return 4;
+  //   }
+  //
+  //   if (date.getMonth() !== 0) {
+  //     return 5;
+  //   }
+  //
+  //   return 6;
+  // }
+  public calculateTraceDepth(traces: Trace[]): TraceScores {
+    const scores: TraceScore[] = [];
+
+    traces.forEach((trace) => {
+      let maxDepth = 0;
+      const depthMap = new Map<string, number>();
+
+      trace.spans.forEach((span) => {
+        const parentDepth = span.parentSpanId
+          ? depthMap.get(span.parentSpanId) || 0
+          : 0;
+        const currentDepth = parentDepth + 1;
+        depthMap.set(span.spanId, currentDepth);
+        maxDepth = Math.max(maxDepth, currentDepth);
+      });
+
+      scores.push({ traceId: trace.id, score: maxDepth });
+    });
+
+    const avgDepth =
+      scores.reduce((acc, curr) => acc + curr.score, 0) / traces.length;
+
+    return {
+      avgScore: avgDepth,
+      scores: scores,
+    };
+  }
+
+  public calculateTraceBreadth(traces: Trace[]): TraceScores {
+    const scores: TraceScore[] = [];
+
+    traces.forEach((trace) => {
+      const uniqueServices = new Set<string>();
+      trace.spans.forEach((span) => {
+        uniqueServices.add(span.resource.service.name);
+      });
+
+      scores.push({ traceId: trace.id, score: uniqueServices.size });
+    });
+
+    const avgBreadth =
+      scores.reduce((acc, curr) => acc + curr.score, 0) / traces.length;
+
+    return {
+      avgScore: avgBreadth,
+      scores: scores,
+    };
+  }
+
   private calculateSTCForSingleTrace(trace: Trace): number {
     const rootSpan =
       trace.spans.find((span) => !span.parentSpanId) ?? trace.spans[0];
@@ -231,81 +308,6 @@ export class TraceDataMetricsService {
 
     return STC;
   }
-
-  // private getMoreGranularUnits(date: Date): number {
-  //   if (date.getMilliseconds() !== 0) {
-  //     return 0;
-  //   }
-  //
-  //   if (date.getSeconds() !== 0) {
-  //     return 1;
-  //   }
-  //
-  //   if (date.getMinutes() !== 0) {
-  //     return 2;
-  //   }
-  //
-  //   if (date.getHours() !== 0) {
-  //     return 3;
-  //   }
-  //
-  //   if (date.getDate() !== 0) {
-  //     return 4;
-  //   }
-  //
-  //   if (date.getMonth() !== 0) {
-  //     return 5;
-  //   }
-  //
-  //   return 6;
-  // }
-
-  public calculateTraceDepth(traces: Trace[]): TraceScores {
-    const scores: TraceScore[] = [];
-
-    traces.forEach((trace) => {
-      let maxDepth = 0;
-      const depthMap = new Map<string, number>();
-
-      trace.spans.forEach((span) => {
-        const parentDepth = span.parentSpanId ? depthMap.get(span.parentSpanId) || 0 : 0;
-        const currentDepth = parentDepth + 1;
-        depthMap.set(span.spanId, currentDepth);
-        maxDepth = Math.max(maxDepth, currentDepth);
-      });
-
-      scores.push({ traceId: trace.id, score: maxDepth });
-    });
-
-    const avgDepth = scores.reduce((acc, curr) => acc + curr.score, 0) / traces.length;
-
-    return {
-      avgScore: avgDepth,
-      scores: scores,
-    };
-  }
-
-  public calculateTraceBreadth(traces: Trace[]): TraceScores {
-    const scores: TraceScore[] = [];
-
-    traces.forEach((trace) => {
-      const uniqueServices = new Set<string>();
-      trace.spans.forEach((span) => {
-        uniqueServices.add(span.resource.service.name);
-      });
-
-      scores.push({ traceId: trace.id, score: uniqueServices.size });
-    });
-
-    const avgBreadth = scores.reduce((acc, curr) => acc + curr.score, 0) / traces.length;
-
-    return {
-      avgScore: avgBreadth,
-      scores: scores,
-    };
-  }
-
-
 
   private calculateAverageScore(
     totalScore: number,

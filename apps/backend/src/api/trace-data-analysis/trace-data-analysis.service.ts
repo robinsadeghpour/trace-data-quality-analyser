@@ -5,6 +5,7 @@ import { TraceDataAnalysisEntity } from './trace-data-analysis.entity';
 import { Trace, TraceDataAnalysis } from '@tdqa/types';
 import { ObjectId } from 'mongodb';
 import { TraceDataMetricsService } from './trace-data-metrics-service/trace-data-metrics.service';
+import {Cron} from "@nestjs/schedule";
 
 @Injectable()
 export class TraceDataAnalysisService {
@@ -16,11 +17,16 @@ export class TraceDataAnalysisService {
 
   private logger = new Logger('TraceDataAnalysisService');
 
-  public async runTraceDataAnalysis(
+  @Cron('55 * * * * *')
+  public async createTraceDataAnalysis(
     traceData: Trace[]
   ): Promise<TraceDataAnalysis> {
     this.logger.log('[runTraceDataAnalysis] Analyzing trace data...');
 
+    return this.createTraceDataAnalysis(traceData);
+  }
+
+  private createTraceDataAnalysis(traceData: Trace[]) {
     const traceDataAnalysis: Partial<TraceDataAnalysis> = {
       timestamp: new Date(),
       spanTimeCoverage: this.traceDataMetricsService.calculateSTC(traceData),
@@ -36,7 +42,8 @@ export class TraceDataAnalysisService {
         this.traceDataMetricsService.calculateMissingActivity(traceData),
       missingProperties:
         this.traceDataMetricsService.calculateMissingProperties(traceData),
-      traceBreadth: this.traceDataMetricsService.calculateTraceBreadth(traceData),
+      traceBreadth:
+        this.traceDataMetricsService.calculateTraceBreadth(traceData),
       traceDepth: this.traceDataMetricsService.calculateTraceDepth(traceData),
     };
 

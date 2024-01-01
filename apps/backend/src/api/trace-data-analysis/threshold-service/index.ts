@@ -15,7 +15,7 @@ export class ThresholdService {
   private readonly repository: MongoRepository<TraceDataAnalysisEntity>;
 
   private logger = new Logger('ThresholdService');
-  private readonly THRESHOLD = 0.001;
+  private readonly THRESHOLD = 0.1;
 
   public async checkThresholds(
     newData: Partial<TraceDataAnalysis>
@@ -43,10 +43,9 @@ export class ThresholdService {
 
         if (previousValue !== 0) {
           // Avoid division by zero
-          const percentageChange =
-            ((newValue - previousValue) / previousValue) * 100;
+          const percentageChange = (newValue - previousValue) / previousValue;
 
-          if (Math.abs(percentageChange) > this.THRESHOLD) {
+          if (Math.abs(percentageChange) >= this.THRESHOLD) {
             this.logger.log(
               '[checkThresholds] Threshold exceeded for ',
               metric,

@@ -1,14 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { TraceDataAnalysisService } from '../trace-data-analysis/trace-data-analysis.service';
-import { ThresholdService } from '../trace-data-analysis/threshold-service';
-import { IDataSourceClientService } from './data-source.service';
+import { TraceDataAnalysisService } from './trace-data-analysis.service';
+import { ThresholdService } from './threshold-service';
+import { IDataSourceClientService } from '../data-source/data-source.service';
 import { IEmailNotificationService } from '../email-notification/email-notification.service';
 import { IGitClientService } from '../git-client/git-client.service';
 
 @Injectable()
-export class DataSourceWorker {
-  private logger = new Logger('DataSourceWorker');
+export class TraceDataAnalysisWorker {
+  private logger = new Logger('TraceDataAnalysisWorker');
 
   public constructor(
     @Inject(IDataSourceClientService)
@@ -24,34 +24,34 @@ export class DataSourceWorker {
   ) {}
 
   @Cron('55 * * * * *')
-  public async fetchCurrentTraceData(): Promise<void> {
-    this.logger.log('[fetchCurrentTraceData] Fetching trace data...');
+  public async runTraceDataAnalysisJob(): Promise<void> {
+    this.logger.log('[runTraceDataAnalysisJob] Fetching trace data...');
     const traces = await this.dataSourceClient.fetchTraceData();
 
     this.logger.log(
-      `[fetchCurrentTraceData] Fetched ${traces.length} traces, starting analysis...`
+      `[runTraceDataAnalysisJob] Fetched ${traces.length} traces, starting analysis...`
     );
     const traceDataAnalysis =
-      await this.traceDataAnalysisService.runTraceDataAnalysis(traces);
+      await this.traceDataAnalysisService.createTraceDataAnalysis(traces);
 
     this.logger.log(
-      `[fetchCurrentTraceData] Analysis finished, checking thresholds...`
+      `[runTraceDataAnalysisJob] Analysis finished, checking thresholds...`
     );
     const threshHoldOverruns =
       await this.thresholdService.checkThresholds(traceDataAnalysis);
 
     if (threshHoldOverruns.length) {
       this.logger.log(
-        '[fetchCurrentTraceData] Thresholds exceeded, sending email and creating GitHub issue...'
+        '[runTraceDataAnalysisJob] Thresholds exceeded, sending email and creating GitHub issue...'
       );
       this.emailNotificationService.sendThresholdOverrunEmail(
         threshHoldOverruns
       );
       this.gitClientService.createThresholdOverrunIssue(threshHoldOverruns);
     } else {
-      this.logger.log('[fetchCurrentTraceData] No thresholds exceeded.');
+      this.logger.log('[runTraceDataAnalysisJob] No thresholds exceeded.');
     }
 
-    this.logger.log('[fetchCurrentTraceData] Done!');
+    this.logger.log('[runTraceDataAnalysisJob] Done!');
   }
 }

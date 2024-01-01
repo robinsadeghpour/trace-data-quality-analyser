@@ -16,7 +16,7 @@ export const thresholdDataProvider: ThresholdServiceDataProvider[] = [
     curr: {
       futureEntry: 15,
     },
-    expectedResult: [{ metric: 'futureEntry', percentageChange: 50 }],
+    expectedResult: [{ metric: 'futureEntry', percentageChange: 0.5 }],
   },
   {
     // Test case where the futureEntry decreases by more than the threshold
@@ -26,17 +26,17 @@ export const thresholdDataProvider: ThresholdServiceDataProvider[] = [
     curr: {
       futureEntry: 10,
     },
-    expectedResult: [{ metric: 'futureEntry', percentageChange: -50 }],
+    expectedResult: [{ metric: 'futureEntry', percentageChange: -0.5 }],
   },
   {
-    // Test case where there is no significant change
+    // Test case where there is a significant change meeting the threshold
     prev: {
       futureEntry: 10,
     },
     curr: {
       futureEntry: 11,
     },
-    expectedResult: [], // Change is only 10%, which is the threshold
+    expectedResult: [{ metric: 'futureEntry', percentageChange: 0.1 }],
   },
   {
     // Test case with multiple metrics, one exceeding threshold and one not
@@ -49,7 +49,7 @@ export const thresholdDataProvider: ThresholdServiceDataProvider[] = [
       spanTimeCoverage: { avgScore: 0.82, scores: [] },
     },
     expectedResult: [
-      { metric: 'futureEntry', percentageChange: 20 },
+      { metric: 'futureEntry', percentageChange: 0.2 },
       // spanTimeCoverage change is not significant enough
     ],
   },

@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { DeleteResult } from 'typeorm';
 import request, { RequestError } from './api.service';
-import { TraceDataAnalysis } from '@tdqa/types';
+import { DockerComposeAnalysis, TraceDataAnalysis } from '@tdqa/types';
 
 type TraceDataAnalysisSelect = keyof TraceDataAnalysis;
 
@@ -19,6 +19,9 @@ export const useTraceDataAnalysis = (): UseQueryResult<TraceDataAnalysis[]> =>
   useQuery(['traceDataAnalysis'], () =>
     request<TraceDataAnalysis[]>('trace-data/analysis')
   );
+
+export const useServiceInfos = (): UseQueryResult<DockerComposeAnalysis> =>
+  useQuery(['serviceInfos'], () => request<TraceDataAnalysis[]>('gitClient'));
 
 export const useDeleteTraceDataAnalysis = (): UseMutationResult<
   DeleteResult,
