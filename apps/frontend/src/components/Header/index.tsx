@@ -11,10 +11,12 @@ const Header = (): JSX.Element => {
       as="nav"
       display={'flex'}
       insetX="0"
-      backgroundColor="gray.700"
+      backgroundColor="gray.900"
+      borderBottom={'2px solid'}
+      borderBottomColor={'gray.700'}
       top={0}
       left={0}
-      width="100vw"
+      width="full"
       height="16"
       padding="3"
       alignItems="center"

@@ -33,7 +33,7 @@ const Settings = (): JSX.Element => {
   };
 
   return (
-    <Box width={'80%'} height="full">
+    <Box flex={1} width={'80%'} height={'100vh'}>
       <Heading size={'xl'}>Settings</Heading>
       <Button onClick={() => navigate('/')} top="4">
         Back

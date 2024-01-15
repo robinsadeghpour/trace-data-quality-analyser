@@ -39,24 +39,24 @@ const App = (): JSX.Element => {
   const notification = useNotification();
 
   return (
-    <Grid
-      gridTemplateColumns={{ md: `1fr` }}
-      width="100vw"
-      height={'100vh'}
-      backgroundColor="gray.100"
+    <Box
+      width="full"
+      backgroundColor="gray.900"
+      // backgroundColor="gray.100"
+      color={'whiteAlpha.900'}
+      minHeight={'100vh'}
+      paddingBottom={8}
     >
-      <Box width="100vw" backgroundColor="gray.100" paddingBottom={8}>
-        <VStack gap={8} width="100vw">
-          <Header />
-          <Routes>
-            {routes.map(({ path, component }) => (
-              <Route path={path} element={component} key={`route-${path}`} />
-            ))}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </VStack>
-      </Box>
-    </Grid>
+      <VStack gap={8} width="full" height={'full'}>
+        <Header />
+        <Routes>
+          {routes.map(({ path, component }) => (
+            <Route path={path} element={component} key={`route-${path}`} />
+          ))}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </VStack>
+    </Box>
   );
 };
 

@@ -1,4 +1,5 @@
 import { ObjectId } from 'typeorm';
+import {RequestBody} from "./types";
 
 export interface ResponseError {
   statusCode: number;
@@ -83,6 +84,7 @@ export interface Resource {
 export interface TraceDataAnalysis extends Document {
   timestamp: Date;
   spanTimeCoverage?: TraceScores;
+  spanTimeCoveragePerService?: Record<string, number>;
   futureEntry?: number;
   infrequentEventOrdering?: TraceScores;
   precision?: TraceScores;
@@ -101,12 +103,14 @@ export interface TraceDataAnalysis extends Document {
 
 export interface TraceScores {
   avgScore: number;
+  serviceName?: string;
   scores: TraceScore[];
 }
 
 export interface TraceScore {
   traceId: string;
   score: number;
+  serviceName?: string;
 }
 
 export interface UserEmail extends Document {
@@ -128,4 +132,9 @@ export interface DockerComposeService {
 export interface DockerComposeAnalysis {
   serviceCount: number;
   services: DockerComposeService[];
+}
+
+export interface MetricChanges {
+  metric: keyof TraceDataAnalysis;
+  percentageChange: number;
 }

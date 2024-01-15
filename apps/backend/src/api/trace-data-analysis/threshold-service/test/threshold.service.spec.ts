@@ -41,4 +41,14 @@ describe('ThresholdService', () => {
       });
     }
   );
+
+  it('should return empty when no previous value correct overruns', async () => {
+    mockRepository.findOne.mockResolvedValue(null);
+
+    const result = await service.checkThresholds({
+      futureEntry: 10,
+    });
+
+    expect(result).toStrictEqual([]);
+  });
 });

@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 import { HStack, VStack, Text, Heading } from '@chakra-ui/react';
 import { DockerComposeAnalysis } from '@tdqa/types';
+import theme from '../../theme';
 
 const CurrentTraceBreadthAndDepthOverview = ({
   serviceInfos,
@@ -16,7 +17,16 @@ const CurrentTraceBreadthAndDepthOverview = ({
   const roundedTraceDepth = traceDepth.toFixed(2);
 
   return (
-    <VStack gap={6}>
+    <VStack
+      height={'100%'}
+      width={'100%'}
+      gap={6}
+      p={8}
+      backgroundColor={theme.colors.gray[800]}
+      borderRadius={'xl'}
+      alignItems={'center'}
+      justifyContent={'center'}
+    >
       <Text fontWeight={'bold'}>
         Current Trace Breadth and Trace Depth Overview
       </Text>

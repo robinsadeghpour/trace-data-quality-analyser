@@ -35,6 +35,9 @@ export class TraceDataAnalysisEntity
   public spanTimeCoverage: TraceScores;
 
   @Column()
+  public spanTimeCoveragePerService?: Record<string, number>;
+
+  @Column()
   public timestamp: Date;
 
   @Column()

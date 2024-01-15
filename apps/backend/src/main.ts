@@ -10,10 +10,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  app.enableCors({
-    credentials: true,
-    origin: [env.APP_URL, env.API_URL].filter(Boolean),
-  });
+  app.enableCors();
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new TypeormExceptionFilter());
@@ -23,7 +20,7 @@ async function bootstrap(): Promise<void> {
   SwaggerModule.setup(globalPrefix, app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );

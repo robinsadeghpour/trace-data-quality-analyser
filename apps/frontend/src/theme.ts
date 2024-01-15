@@ -1,7 +1,7 @@
 import {
   StyleConfig,
   extendTheme,
-  withDefaultColorScheme,
+  withDefaultColorScheme, ThemeConfig,
 } from '@chakra-ui/react';
 
 const components: Record<string, StyleConfig> = {
@@ -14,8 +14,14 @@ const components: Record<string, StyleConfig> = {
   },
 };
 
+const config: ThemeConfig = {
+  initialColorMode: 'dark',
+  useSystemColorMode: false,
+};
+
 const theme = extendTheme(
   {
+    config,
     components,
     colors: {
       gray: {
@@ -31,16 +37,16 @@ const theme = extendTheme(
         900: '#242424',
       },
       primary: {
-        50: '#dbf2f2',
-        100: '#c9ecec',
-        200: '#b7e6e6',
-        300: '#93d9d9',
-        400: '#6fcdcd',
-        500: '#4bc0c0',
-        600: '#3c9a9a',
-        700: '#266060',
-        800: '#1e4d4d',
-        900: '#0f2626',
+        50: '#f4e2d2',
+        100: '#efd4bc',
+        200: '#dfa879',
+        300: '#d48b4c',
+        400: '#ce7d35',
+        500: '#FB8B24',
+        600: '#b5631c',
+        700: '#502c0c',
+        800: '#281606',
+        900: '#140b03',
       },
     },
   },

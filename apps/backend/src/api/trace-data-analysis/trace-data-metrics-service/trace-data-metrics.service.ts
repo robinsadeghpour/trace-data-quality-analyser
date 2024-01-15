@@ -5,40 +5,6 @@ import { Trace, TraceScore, TraceScores } from '@tdqa/types';
 export class TraceDataMetricsService {
   private logger = new Logger('TraceDataService');
 
-  // public calculatePrecision(traces: Trace[]): TraceScores {
-  //   const traceScores: TraceScore[] = [];
-  //   let totalScore = 0;
-  //
-  //   traces.forEach((trace) => {
-  //     console.log(trace);
-  //     const traceGranularity = trace.spans.reduce((acc, span) => {
-  //       const timestamp = new Date(span.timestamp);
-  //
-  //       const moreGranularUnits = this.getMoreGranularUnits(timestamp);
-  //       console.log(moreGranularUnits);
-  //
-  //       return acc + moreGranularUnits;
-  //     }, 0);
-  //
-  //     console.log(traceGranularity);
-  //
-  //     const traceScore = Math.pow(
-  //       1 - traceGranularity / (6 * trace.spans.length),
-  //       2
-  //     );
-  //     totalScore += traceScore;
-  //
-  //     traceScores.push({ traceId: trace.id, score: traceScore });
-  //   });
-  //
-  //   const avgScore = this.calculateAverageScore(totalScore, traces.length);
-  //
-  //   return {
-  //     avgScore: avgScore,
-  //     scores: traceScores,
-  //   };
-  // }
-
   public calculateInfrequentEventOrdering(traces: Trace[]): TraceScores {
     let totalScore = 0;
     const traceScores: TraceScore[] = [];
@@ -137,6 +103,34 @@ export class TraceDataMetricsService {
     };
   }
 
+  public calculateSTCPS(traces: Trace[]): Record<string, number> {
+    const serviceScores: Record<string, number> = {};
+    let totalTraces = 0;
+
+    traces.forEach((trace) => {
+      const serviceCoverage = this.calculateSTCPSForSingleTrace(trace);
+      this.logger.log('Service Coverage for Trace:', serviceCoverage);
+
+      Object.entries(serviceCoverage).forEach(([serviceName, coverage]) => {
+        if (!serviceScores[serviceName]) {
+          serviceScores[serviceName] = 0;
+        }
+
+        serviceScores[serviceName] += coverage;
+      });
+      totalTraces++;
+    });
+
+    // Calculate average score for each service
+    Object.keys(serviceScores).forEach((service) => {
+      serviceScores[service] = serviceScores[service] / totalTraces;
+    });
+
+    this.logger.log('Final Service Scores:', serviceScores);
+
+    return serviceScores;
+  }
+
   public calculateMissingActivity(traces: Trace[]): number {
     let totalAffectedSpans = 0;
     let totalSpans = 0;
@@ -196,34 +190,6 @@ export class TraceDataMetricsService {
     };
   }
 
-  // private getMoreGranularUnits(date: Date): number {
-
-  //   if (date.getMilliseconds() !== 0) {
-  //     return 0;
-  //   }
-  //
-  //   if (date.getSeconds() !== 0) {
-  //     return 1;
-  //   }
-  //
-  //   if (date.getMinutes() !== 0) {
-  //     return 2;
-  //   }
-  //
-  //   if (date.getHours() !== 0) {
-  //     return 3;
-  //   }
-  //
-  //   if (date.getDate() !== 0) {
-  //     return 4;
-  //   }
-  //
-  //   if (date.getMonth() !== 0) {
-  //     return 5;
-  //   }
-  //
-  //   return 6;
-  // }
   public calculateTraceDepth(traces: Trace[]): TraceScores {
     const scores: TraceScore[] = [];
 
@@ -271,6 +237,52 @@ export class TraceDataMetricsService {
       avgScore: avgBreadth,
       scores: scores,
     };
+  }
+
+  private calculateSTCPSForSingleTrace(trace: Trace): Record<string, number> {
+    // Check if there's only one span in the trace
+    if (trace.spans.length === 1) {
+      const singleSpan = trace.spans[0];
+      const service = singleSpan.resource.service.name;
+
+      return { [service]: 100 }; // The single span covers the entire trace duration
+    }
+
+    const rootSpan =
+      trace.spans.find((span) => !span.parentSpanId) ?? trace.spans[0];
+    const rootSpanStart = rootSpan.timestamp.getTime();
+    const rootSpanEnd = rootSpan.endTimestamp.getTime();
+    const rootSpanDuration = rootSpanEnd - rootSpanStart || 1;
+
+    if (rootSpanDuration === 0) {
+      this.logger.warn(
+        'Root span duration is zero, which may lead to incorrect STCPS calculation.'
+      );
+
+      return {};
+    }
+
+    const serviceDurations: Record<string, number> = {};
+
+    trace.spans.forEach((span) => {
+      if (span.spanId !== rootSpan.spanId) {
+        const service = span.resource.service.name;
+        const spanStart = Math.max(span.timestamp.getTime(), rootSpanStart);
+        const spanEnd = Math.min(span.endTimestamp.getTime(), rootSpanEnd);
+        const spanDuration = Math.max(0, spanEnd - spanStart);
+
+        serviceDurations[service] =
+          (serviceDurations[service] || 0) + spanDuration;
+      }
+    });
+
+    // Convert durations to percentages for each service
+    Object.keys(serviceDurations).forEach((service) => {
+      serviceDurations[service] =
+        (serviceDurations[service] / rootSpanDuration) * 100;
+    });
+
+    return serviceDurations;
   }
 
   private calculateSTCForSingleTrace(trace: Trace): number {

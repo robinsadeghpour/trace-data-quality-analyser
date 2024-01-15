@@ -1,9 +1,12 @@
 import { Octokit } from '@octokit/rest';
 import { Injectable, Logger } from '@nestjs/common';
-import { ThresholdOverrun } from '../trace-data-analysis/threshold-service';
 import { env } from '../../env';
 import { IGitClientService } from './git-client.service';
-import { DockerComposeAnalysis, DockerComposeService } from '@tdqa/types';
+import {
+  DockerComposeAnalysis,
+  DockerComposeService,
+  MetricChanges,
+} from '@tdqa/types';
 import { parse } from 'yaml';
 
 @Injectable()
@@ -22,9 +25,7 @@ export class GithubClientService implements IGitClientService {
     return this.parseDockerComposeYaml(dockerComposeFile);
   }
 
-  public createThresholdOverrunIssue(
-    thresholdOverruns: ThresholdOverrun[]
-  ): void {
+  public createThresholdOverrunIssue(thresholdOverruns: MetricChanges[]): void {
     this.logger.log(
       '[createThresholdOverrunIssue] creating threshold overrun issue'
     );

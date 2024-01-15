@@ -5,7 +5,6 @@ import { TraceDataAnalysisEntity } from './trace-data-analysis.entity';
 import { Trace, TraceDataAnalysis } from '@tdqa/types';
 import { ObjectId } from 'mongodb';
 import { TraceDataMetricsService } from './trace-data-metrics-service/trace-data-metrics.service';
-import {Cron} from "@nestjs/schedule";
 
 @Injectable()
 export class TraceDataAnalysisService {
@@ -17,41 +16,12 @@ export class TraceDataAnalysisService {
 
   private logger = new Logger('TraceDataAnalysisService');
 
-  @Cron('55 * * * * *')
-  public async createTraceDataAnalysis(
+  public async runTraceDataAnalysis(
     traceData: Trace[]
   ): Promise<TraceDataAnalysis> {
     this.logger.log('[runTraceDataAnalysis] Analyzing trace data...');
 
     return this.createTraceDataAnalysis(traceData);
-  }
-
-  private createTraceDataAnalysis(traceData: Trace[]) {
-    const traceDataAnalysis: Partial<TraceDataAnalysis> = {
-      timestamp: new Date(),
-      spanTimeCoverage: this.traceDataMetricsService.calculateSTC(traceData),
-      futureEntry: this.traceDataMetricsService.calculateFutureEntry(traceData),
-      duplicatesWithinTrace:
-        this.traceDataMetricsService.calculateDuplicatesWithinTrace(traceData),
-      infrequentEventOrdering:
-        this.traceDataMetricsService.calculateInfrequentEventOrdering(
-          traceData
-        ),
-      // precision: this.traceDataMetricsService.calculatePrecision(traceData),
-      missingActivity:
-        this.traceDataMetricsService.calculateMissingActivity(traceData),
-      missingProperties:
-        this.traceDataMetricsService.calculateMissingProperties(traceData),
-      traceBreadth:
-        this.traceDataMetricsService.calculateTraceBreadth(traceData),
-      traceDepth: this.traceDataMetricsService.calculateTraceDepth(traceData),
-    };
-
-    this.logger.log('[runTraceDataAnalysis] Trace Data Analysis done');
-
-    const traceDataAnalysisEntity = this.repository.create(traceDataAnalysis);
-
-    return this.repository.save(traceDataAnalysisEntity);
   }
 
   public async getTraceDataAnalysis(): Promise<TraceDataAnalysis[]> {
@@ -111,5 +81,37 @@ export class TraceDataAnalysisService {
     }
 
     return result;
+  }
+
+  private createTraceDataAnalysis(
+    traceData: Trace[]
+  ): Promise<TraceDataAnalysisEntity> {
+    const traceDataAnalysis: Partial<TraceDataAnalysis> = {
+      timestamp: new Date(),
+      spanTimeCoverage: this.traceDataMetricsService.calculateSTC(traceData),
+      spanTimeCoveragePerService:
+        this.traceDataMetricsService.calculateSTCPS(traceData),
+      futureEntry: this.traceDataMetricsService.calculateFutureEntry(traceData),
+      duplicatesWithinTrace:
+        this.traceDataMetricsService.calculateDuplicatesWithinTrace(traceData),
+      infrequentEventOrdering:
+        this.traceDataMetricsService.calculateInfrequentEventOrdering(
+          traceData
+        ),
+      // precision: this.traceDataMetricsService.calculatePrecision(traceData),
+      missingActivity:
+        this.traceDataMetricsService.calculateMissingActivity(traceData),
+      missingProperties:
+        this.traceDataMetricsService.calculateMissingProperties(traceData),
+      traceBreadth:
+        this.traceDataMetricsService.calculateTraceBreadth(traceData),
+      traceDepth: this.traceDataMetricsService.calculateTraceDepth(traceData),
+    };
+
+    this.logger.log('[runTraceDataAnalysis] Trace Data Analysis done');
+
+    const traceDataAnalysisEntity = this.repository.create(traceDataAnalysis);
+
+    return this.repository.save(traceDataAnalysisEntity);
   }
 }

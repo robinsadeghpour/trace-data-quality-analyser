@@ -7,6 +7,11 @@ export interface TraceDataProvider {
   currentTime?: Date;
 }
 
+export interface STCPSDataProvider {
+  spans: Partial<Span>[];
+  expectedScores: Record<string, number>;
+}
+
 export const getInfrequentEventOrderingDataProvider =
   (): TraceDataProvider[] => {
     const timestamp = new Date();
@@ -232,6 +237,70 @@ export const getSpanTimeCoverageDataProvider = (): TraceDataProvider[] => {
         },
       ],
       expectedScore: 50, // Child spans cover 50% of the root span's duration
+    },
+  ];
+};
+
+export const getSTCPSCoverageDataProvider = (): STCPSDataProvider[] => {
+  const baseTimestamp = new Date();
+
+  return [
+    {
+      // Single span with no child spans in one service
+      spans: [
+        {
+          spanId: 'root',
+          timestamp: baseTimestamp,
+          endTimestamp: addMilliseconds(baseTimestamp, 100),
+          resource: { service: { name: 'serviceA' } },
+        },
+      ],
+      expectedScores: { serviceA: 100 },
+    },
+    {
+      // Root span with one direct child span in the same service
+      spans: [
+        {
+          spanId: 'root',
+          timestamp: baseTimestamp,
+          endTimestamp: addMilliseconds(baseTimestamp, 200),
+          resource: { service: { name: 'serviceA' } },
+        },
+        {
+          spanId: 'child1',
+          parentSpanId: 'root',
+          timestamp: addMilliseconds(baseTimestamp, 50),
+          endTimestamp: addMilliseconds(baseTimestamp, 150),
+          resource: { service: { name: 'serviceA' } },
+        },
+      ],
+      expectedScores: { serviceA: 50 },
+    },
+    {
+      // Root span with child spans in different services
+      spans: [
+        {
+          spanId: 'root',
+          timestamp: baseTimestamp,
+          endTimestamp: addMilliseconds(baseTimestamp, 200),
+          resource: { service: { name: 'serviceA' } },
+        },
+        {
+          spanId: 'child1',
+          parentSpanId: 'root',
+          timestamp: addMilliseconds(baseTimestamp, 50),
+          endTimestamp: addMilliseconds(baseTimestamp, 150),
+          resource: { service: { name: 'serviceB' } },
+        },
+        {
+          spanId: 'child2',
+          parentSpanId: 'root',
+          timestamp: addMilliseconds(baseTimestamp, 100),
+          endTimestamp: addMilliseconds(baseTimestamp, 200),
+          resource: { service: { name: 'serviceC' } },
+        },
+      ],
+      expectedScores: { serviceB: 50, serviceC: 50 },
     },
   ];
 };
@@ -462,81 +531,6 @@ export const getMissingActivityDataProvider = (): TraceDataProvider[] => {
   ];
 };
 
-// export const getPrecisionDataProvider = () => {
-//   return [
-//     {
-//       // span with millisecond precision
-//       spans: [
-//         { spanId: 'span1', timestamp: new Date('2023-01-01T00:00:00.123Z') },
-//       ],
-//       expectedScore: 1, // Highest precision, score is 1
-//     },
-//     {
-//       // span with seconds precision
-//       spans: [
-//         { spanId: 'span1', timestamp: new Date('2023-01-01T00:00:12.00Z') },
-//       ],
-//       expectedScore: Math.pow(1 - 1 / 6, 2),
-//     },
-//     {
-//       // All spans with minutes precision
-//       spans: [
-//         { spanId: 'span1', timestamp: new Date('2023-01-01T00:12:00.00Z') },
-//       ],
-//       expectedScore: Math.pow(1 - 2 / 6, 2), // Highest precision, score is 1
-//     },
-//     {
-//       // All spans with hour precision
-//       spans: [
-//         { spanId: 'span1', timestamp: new Date('2023-01-01T23:00:00.00Z') },
-//       ],
-//       expectedScore: Math.pow(1 - 3 / 6, 2), // Highest precision, score is 1
-//     },
-//     // {
-//     //   // All spans with millisecond precision
-//     //   spans: [
-//     //     { spanId: 'span1', timestamp: new Date('2023-01-01T00:00:00.123Z') },
-//     //     { spanId: 'span2', timestamp: new Date('2023-01-01T00:00:00.456Z') },
-//     //   ],
-//     //   expectedScore: 1, // Highest precision, score is 1
-//     // },
-//     // {
-//     //   // Spans with second and millisecond precision
-//     //   spans: [
-//     //     { spanId: 'span1', timestamp: new Date('2023-01-01T00:00:00Z') },
-//     //     { spanId: 'span2', timestamp: new Date('2023-01-01T00:00:00.123Z') },
-//     //   ],
-//     //   expectedScore: Math.pow(1 - 1 / (6 * 2), 2), // One span with second precision, one with millisecond
-//     // },
-//     // {
-//     //   // Spans with minute and second precision
-//     //   spans: [
-//     //     { spanId: 'span1', timestamp: new Date('2023-01-01T00:00Z') },
-//     //     { spanId: 'span2', timestamp: new Date('2023-01-01T00:00:00Z') },
-//     //   ],
-//     //   expectedScore: Math.pow(1 - (2 + 1) / (6 * 2), 2), // One span with minute precision, one with second
-//     // },
-//     // {
-//     //   // Spans with hour and day precision
-//     //   spans: [
-//     //     { spanId: 'span1', timestamp: new Date('2023-01-01T00Z') },
-//     //     { spanId: 'span2', timestamp: new Date('2023-01-01') },
-//     //   ],
-//     //   expectedScore: Math.pow(1 - (3 + 4) / (6 * 2), 2), // One span with hour precision, one with day
-//     // },
-//     // {
-//     //   // Spans with varying levels of precision
-//     //   spans: [
-//     //     { spanId: 'span1', timestamp: new Date('2023-01-01') },
-//     //     { spanId: 'span2', timestamp: new Date('2023-01-01T00Z') },
-//     //     { spanId: 'span3', timestamp: new Date('2023-01-01T00:00Z') },
-//     //     { spanId: 'span4', timestamp: new Date('2023-01-01T00:00:00.123Z') },
-//     //   ],
-//     //   expectedScore: Math.pow(1 - (4 + 3 + 2 + 0) / (6 * 4), 2), // Spans with day, hour, second, and millisecond precision
-//     // },
-//   ];
-// };
-
 export const getTraceDepthDataProvider = (): TraceDataProvider[] => {
   return [
     {
@@ -574,29 +568,60 @@ export const getTraceBreadthDataProvider = (): TraceDataProvider[] => {
     {
       // Trace with spans from two unique services
       spans: [
-        { spanId: 'a', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
-        { spanId: 'b', timestamp: new Date(), resource: { service: {name: 'ServiceB'} } },
+        {
+          spanId: 'a',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceA' } },
+        },
+        {
+          spanId: 'b',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceB' } },
+        },
       ],
       expectedScore: 2,
     },
     {
       // Trace with spans from three unique services
       spans: [
-        { spanId: 'a', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
-        { spanId: 'b', timestamp: new Date(), resource: { service: {name: 'ServiceB'} } },
-        { spanId: 'c', timestamp: new Date(), resource: { service: {name: 'ServiceC'} } },
+        {
+          spanId: 'a',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceA' } },
+        },
+        {
+          spanId: 'b',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceB' } },
+        },
+        {
+          spanId: 'c',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceC' } },
+        },
       ],
       expectedScore: 3, // Three unique services
     },
     {
       // Trace with multiple spans from the same service
       spans: [
-        { spanId: 'a', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
-        { spanId: 'b', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
-        { spanId: 'c', timestamp: new Date(), resource: { service: {name: 'ServiceA'} } },
+        {
+          spanId: 'a',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceA' } },
+        },
+        {
+          spanId: 'b',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceA' } },
+        },
+        {
+          spanId: 'c',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceA' } },
+        },
       ],
       expectedScore: 1, // One unique service
     },
   ];
 };
-

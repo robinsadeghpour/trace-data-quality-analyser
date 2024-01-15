@@ -9,12 +9,22 @@ export class ElasticsearchDataSourceService
   implements IDataSourceClientService
 {
   private readonly client: Client;
+  private readonly index = process.env.ELASTICSEARCH_INDEX || 'trace_index';
 
-  private readonly index = 'trace_index';
-
-  // TODO put address and index in env
   public constructor() {
-    this.client = new Client({ node: 'http://localhost:9200' });
+    const node = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
+    const auth =
+      process.env.ELASTICSEARCH_USERNAME && process.env.ELASTICSEARCH_PASSWORD
+        ? {
+            username: process.env.ELASTICSEARCH_USERNAME,
+            password: process.env.ELASTICSEARCH_PASSWORD,
+          }
+        : undefined;
+
+    this.client = new Client({
+      node,
+      auth,
+    });
   }
 
   public async fetchTraceData(): Promise<Trace[]> {

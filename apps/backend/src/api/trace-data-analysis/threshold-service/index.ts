@@ -1,13 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TraceDataAnalysis } from '@tdqa/types';
+import { MetricChanges, RequestBody, TraceDataAnalysis } from '@tdqa/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TraceDataAnalysisEntity } from '../trace-data-analysis.entity';
 import { MongoRepository } from 'typeorm';
-
-export interface ThresholdOverrun {
-  metric: keyof TraceDataAnalysis;
-  percentageChange: number;
-}
 
 @Injectable()
 export class ThresholdService {
@@ -17,50 +12,65 @@ export class ThresholdService {
   private logger = new Logger('ThresholdService');
   private readonly THRESHOLD = 0.1;
 
+  public async calculateMetricChanges(): Promise<MetricChanges[]> {
+    const lastTwoData = await this.repository.find({
+      order: { timestamp: 'DESC' },
+      take: 2,
+    });
+
+    if (lastTwoData.length < 2) {
+      return [];
+    }
+
+    const [newData, previousData] = lastTwoData;
+
+    return this.calculateChanges(newData, previousData);
+  }
+
   public async checkThresholds(
-    newData: Partial<TraceDataAnalysis>
-  ): Promise<ThresholdOverrun[]> {
+    newData: Partial<RequestBody<TraceDataAnalysis>>
+  ): Promise<MetricChanges[]> {
     const previousData = await this.repository.findOne({
       order: { timestamp: 'DESC' },
     });
 
-    const thresholdOverruns: ThresholdOverrun[] = [];
-
     if (!previousData) {
-      return thresholdOverruns;
+      return [];
     }
 
-    for (const metric in newData) {
-      this.logger.log('[checkThresholds] Checking metric', metric);
+    const changes = this.calculateChanges(newData, previousData);
 
-      if (newData[metric] && previousData[metric]) {
-        const newValue = newData[metric].avgScore
-          ? newData[metric].avgScore
-          : newData[metric];
-        const previousValue = previousData[metric].avgScore
-          ? previousData[metric].avgScore
-          : previousData[metric];
+    return changes.filter(
+      (change) => Math.abs(change.percentageChange) >= this.THRESHOLD
+    );
+  }
+
+  private calculateChanges(
+    newData: Partial<TraceDataAnalysis>,
+    previousData: TraceDataAnalysis
+  ): MetricChanges[] {
+    const changes: MetricChanges[] = [];
+
+    for (const metric in newData) {
+      if (
+        !['_id', 'created_at', 'updated_at', 'timestamp'].includes(metric) &&
+        newData[metric] &&
+        previousData[metric]
+      ) {
+        const newValue = newData[metric].avgScore ?? newData[metric];
+        const previousValue =
+          previousData[metric].avgScore ?? previousData[metric];
 
         if (previousValue !== 0) {
-          // Avoid division by zero
           const percentageChange = (newValue - previousValue) / previousValue;
-
-          if (Math.abs(percentageChange) >= this.THRESHOLD) {
-            this.logger.log(
-              '[checkThresholds] Threshold exceeded for ',
-              metric,
-              'by',
-              `${percentageChange.toFixed(2)}%`
-            );
-            thresholdOverruns.push({
-              metric: metric as keyof TraceDataAnalysis,
-              percentageChange: parseFloat(percentageChange.toFixed(2)),
-            });
-          }
+          changes.push({
+            metric: metric as keyof TraceDataAnalysis,
+            percentageChange: parseFloat(percentageChange.toFixed(2)),
+          });
         }
       }
     }
 
-    return thresholdOverruns;
+    return changes;
   }
 }

@@ -1,9 +1,7 @@
-import { ThresholdOverrun } from '../trace-data-analysis/threshold-service';
+import { MetricChanges } from '@tdqa/types';
 
 export interface IEmailNotificationService {
-  sendThresholdOverrunEmail(
-    thresholdOveruns: ThresholdOverrun[]
-  ): Promise<void>;
+  sendThresholdOverrunEmail(thresholdOveruns: MetricChanges[]): Promise<void>;
 }
 
 export const IEmailNotificationService = Symbol('IEmailNotificationService');

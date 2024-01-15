@@ -1,8 +1,8 @@
-import { ThresholdOverrun } from '../trace-data-analysis/threshold-service';
-import { DockerComposeAnalysis } from '@tdqa/types';
+
+import {DockerComposeAnalysis, MetricChanges} from '@tdqa/types';
 
 export interface IGitClientService {
-  createThresholdOverrunIssue(thresholdOveruns: ThresholdOverrun[]): void;
+  createThresholdOverrunIssue(thresholdOveruns: MetricChanges[]): void;
   getServiceInfosFromRepoFile(): Promise<DockerComposeAnalysis>;
 }
 

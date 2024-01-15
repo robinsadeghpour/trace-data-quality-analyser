@@ -18,14 +18,16 @@ import { ErrorDto } from '../../app/error.dto';
 
 import { TraceDataAnalysisDto } from './trace-data-analysis.dto';
 import { TraceDataAnalysisService } from './trace-data-analysis.service';
-import { TraceDataAnalysis } from '@tdqa/types';
+import { MetricChanges, TraceDataAnalysis } from '@tdqa/types';
 import { DeleteResult } from 'typeorm';
+import { ThresholdService } from './threshold-service';
 
 @ApiTags('analysis')
 @Controller('trace-data/analysis')
 export class TraceDataAnalysisController {
   public constructor(
-    private readonly traceDataAnalysisService: TraceDataAnalysisService
+    private readonly traceDataAnalysisService: TraceDataAnalysisService,
+    private readonly thresholdService: ThresholdService
   ) {}
 
   @Get()
@@ -42,8 +44,14 @@ export class TraceDataAnalysisController {
     description: 'Filter by status',
   })
   public async getTraceDataAnalysis(): Promise<TraceDataAnalysis[]> {
-    console.log("getTraceDataAnalysis")
     return this.traceDataAnalysisService.getTraceDataAnalysis();
+  }
+
+  @Get('/changes')
+  @ApiOperation({ summary: 'Get latest trace-data-analysis changes' })
+  @ApiOkResponse({ type: Object, isArray: true })
+  public async getTraceDataAnalysisChanges(): Promise<MetricChanges[]> {
+    return this.thresholdService.calculateMetricChanges();
   }
 
   @Delete(':id')

@@ -33,6 +33,9 @@ export class TraceDataAnalysisDto
   @ApiPropertyOptional({ type: () => Object })
   public spanTimeCoverage: TraceScores;
 
+  @ApiPropertyOptional({ type: () => Object })
+  public spanTimeCoveragePerService: Record<string, number>;
+
   @ApiPropertyOptional({ type: () => Date })
   public timestamp: Date;
 

@@ -7,7 +7,11 @@ import {
 } from '@tanstack/react-query';
 import { DeleteResult } from 'typeorm';
 import request, { RequestError } from './api.service';
-import { DockerComposeAnalysis, TraceDataAnalysis } from '@tdqa/types';
+import {
+  DockerComposeAnalysis,
+  MetricChanges,
+  TraceDataAnalysis,
+} from '@tdqa/types';
 
 type TraceDataAnalysisSelect = keyof TraceDataAnalysis;
 
@@ -52,3 +56,10 @@ export const useTraceDataAnalysisById = (
     request<TraceDataAnalysis>(`/trace-data/analysis/${id}`, { params })
   );
 };
+
+export const useTraceDataAnalysisChanges = (): UseQueryResult<
+  MetricChanges[]
+> =>
+  useQuery(['traceDataAnalysis', ',metricChanges'], () =>
+    request<TraceDataAnalysis[]>('trace-data/analysis/changes')
+  );

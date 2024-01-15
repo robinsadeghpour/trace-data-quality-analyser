@@ -6,7 +6,11 @@ import {
   getInfrequentEventOrderingDataProvider,
   getMissingActivityDataProvider,
   getMissingPropertiesDataProvider,
-  getSpanTimeCoverageDataProvider, getTraceBreadthDataProvider, getTraceDepthDataProvider,
+  getSpanTimeCoverageDataProvider,
+  getSTCPSCoverageDataProvider,
+  getTraceBreadthDataProvider,
+  getTraceDepthDataProvider,
+  STCPSDataProvider,
   TraceDataProvider,
 } from './trace-data-metrics.data-provider';
 import { Span } from '@tdqa/types';
@@ -62,6 +66,26 @@ describe('TraceDataMetricsService', () => {
           { id: '', spans: spans as Span[] },
         ]);
         expect(result.avgScore).toBe(expectedScore);
+      });
+    }
+  );
+
+  describe.each(getSTCPSCoverageDataProvider())(
+    'Span Time Coverage per Service',
+    ({ spans, expectedScores }: STCPSDataProvider) => {
+      it(`should calculate the correct score for given spans`, () => {
+        const result = underTest.calculateSTCPS([
+          { id: '', spans: spans as Span[] },
+        ]);
+
+        console.log(result)
+
+        // Iterate over each service in the expectedScores and check the result
+        for (const [serviceName, expectedScore] of Object.entries(
+          expectedScores
+        )) {
+          expect(result[serviceName]).toBe(expectedScore);
+        }
       });
     }
   );

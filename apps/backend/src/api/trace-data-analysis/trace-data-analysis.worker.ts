@@ -23,7 +23,7 @@ export class TraceDataAnalysisWorker {
     private readonly gitClientService: IGitClientService
   ) {}
 
-  @Cron('55 * * * * *')
+  @Cron('0 * * * *')
   public async runTraceDataAnalysisJob(): Promise<void> {
     this.logger.log('[runTraceDataAnalysisJob] Fetching trace data...');
     const traces = await this.dataSourceClient.fetchTraceData();
@@ -32,7 +32,7 @@ export class TraceDataAnalysisWorker {
       `[runTraceDataAnalysisJob] Fetched ${traces.length} traces, starting analysis...`
     );
     const traceDataAnalysis =
-      await this.traceDataAnalysisService.createTraceDataAnalysis(traces);
+      await this.traceDataAnalysisService.runTraceDataAnalysis(traces);
 
     this.logger.log(
       `[runTraceDataAnalysisJob] Analysis finished, checking thresholds...`

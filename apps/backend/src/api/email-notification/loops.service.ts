@@ -2,9 +2,8 @@ import { Injectable, Inject } from '@nestjs/common';
 import axios from 'axios';
 import { env } from '../../env';
 import { IEmailNotificationService } from './email-notification.service';
-import { ThresholdOverrun } from '../trace-data-analysis/threshold-service';
 import { UserEmailService } from '../user-email/user-email.service';
-import { TransactionalMailsEnum } from '@tdqa/types';
+import { MetricChanges, TransactionalMailsEnum } from '@tdqa/types';
 
 @Injectable()
 export class LoopsService implements IEmailNotificationService {
@@ -12,7 +11,7 @@ export class LoopsService implements IEmailNotificationService {
   private readonly userEmailService: UserEmailService;
 
   public async sendThresholdOverrunEmail(
-    thresholdOverruns: ThresholdOverrun[]
+    thresholdOverruns: MetricChanges[]
   ): Promise<void> {
     const emails = await this.userEmailService.getUserEmails();
 

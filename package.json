@@ -3,7 +3,12 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx run-many --target=serve --all=true"
+    "backend": "nx serve backend",
+    "landing-page": "nx serve landing-page",
+    "start:prod": "node dist/apps/backend/main.js",
+    "build": "nx run-many --target=build --projects=backend,frontend, --parallel=true",
+    "dev": "nx run-many --target=serve --all=true",
+    "gen:theme-typings": "chakra-cli tokens apps/frontend/src/theme.ts"
   },
   "private": true,
   "dependencies": {
@@ -32,6 +37,7 @@
     "react": "18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
+    "react-gauge-chart": "^0.4.1",
     "react-icons": "^4.11.0",
     "react-router-dom": "6.11.2",
     "reflect-metadata": "^0.1.13",
@@ -64,6 +70,7 @@
     "@types/node": "18.14.2",
     "@types/react": "18.2.13",
     "@types/react-dom": "18.2.6",
+    "@types/react-gauge-chart": "^0.4.3",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
     "babel-jest": "^29.4.1",

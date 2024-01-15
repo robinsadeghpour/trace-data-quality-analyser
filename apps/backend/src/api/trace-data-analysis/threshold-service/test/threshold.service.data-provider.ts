@@ -1,10 +1,9 @@
-import { TraceDataAnalysis } from '@tdqa/types';
-import { ThresholdOverrun } from '../index';
+import { MetricChanges, TraceDataAnalysis } from '@tdqa/types';
 
 export interface ThresholdServiceDataProvider {
   prev: Partial<TraceDataAnalysis>;
   curr: Partial<TraceDataAnalysis>;
-  expectedResult: ThresholdOverrun[];
+  expectedResult: MetricChanges[];
 }
 
 export const thresholdDataProvider: ThresholdServiceDataProvider[] = [
