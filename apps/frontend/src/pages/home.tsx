@@ -69,6 +69,8 @@ const HomePage = (): ReactElement => {
   const currentTraceDepth =
     sortedTraceDataAnalysis?.[0]?.traceDepth?.avgScore ?? 0;
 
+  console.log(sortedTraceDataAnalysis);
+
   return (
     <Box px={16}>
       <HStack wrap={'wrap'} width={'full'} gap={4}>
@@ -76,14 +78,16 @@ const HomePage = (): ReactElement => {
           <MetricGaugeChart
             title={'Avg Span Time Coverage'}
             percentValue={
-              traceDataAnalysis?.[0].spanTimeCoverage?.avgScore ?? 0
+              (sortedTraceDataAnalysis?.[0]?.spanTimeCoverage?.avgScore) ?? 0
             }
           />
         </Box>
         <Box flex={1} width={['1/5']} height={'full'}>
           <MetricPieChart
             title={'Span Time Coverage per Service'}
-            data={traceDataAnalysis?.[0].spanTimeCoveragePerService ?? {}}
+            data={
+              sortedTraceDataAnalysis?.[0]?.spanTimeCoveragePerService ?? {}
+            }
           />
         </Box>
         {traceDataProperties

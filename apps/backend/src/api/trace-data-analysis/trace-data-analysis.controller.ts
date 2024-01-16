@@ -4,7 +4,7 @@ import {
   Get,
   Param,
   ParseArrayPipe,
-  ParseUUIDPipe,
+  ParseUUIDPipe, Post,
   Query,
 } from '@nestjs/common';
 import {
@@ -52,6 +52,13 @@ export class TraceDataAnalysisController {
   @ApiOkResponse({ type: Object, isArray: true })
   public async getTraceDataAnalysisChanges(): Promise<MetricChanges[]> {
     return this.thresholdService.calculateMetricChanges();
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Run trace-data-analysis' })
+  @ApiOkResponse({ type: TraceDataAnalysisDto })
+  public async runAnalysis(): Promise<TraceDataAnalysis> {
+    return this.traceDataAnalysisService.runTraceDataAnalysis();
   }
 
   @Delete(':id')

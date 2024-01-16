@@ -5,6 +5,10 @@ import { TraceDataAnalysisEntity } from './trace-data-analysis.entity';
 import { Trace, TraceDataAnalysis } from '@tdqa/types';
 import { ObjectId } from 'mongodb';
 import { TraceDataMetricsService } from './trace-data-metrics-service/trace-data-metrics.service';
+import { IDataSourceClientService } from '../data-source/data-source.service';
+import { ThresholdService } from './threshold-service';
+import { IEmailNotificationService } from '../email-notification/email-notification.service';
+import { IGitClientService } from '../git-client/git-client.service';
 
 @Injectable()
 export class TraceDataAnalysisService {
@@ -16,12 +20,49 @@ export class TraceDataAnalysisService {
 
   private logger = new Logger('TraceDataAnalysisService');
 
-  public async runTraceDataAnalysis(
-    traceData: Trace[]
-  ): Promise<TraceDataAnalysis> {
+  public constructor(
+    @Inject(IDataSourceClientService)
+    private readonly dataSourceClient: IDataSourceClientService,
+    @Inject(ThresholdService)
+    private readonly thresholdService: ThresholdService,
+    @Inject(IEmailNotificationService)
+    private readonly emailNotificationService: IEmailNotificationService,
+    @Inject(IGitClientService)
+    private readonly gitClientService: IGitClientService
+  ) {}
+
+  public async runTraceDataAnalysis(): Promise<TraceDataAnalysis> {
     this.logger.log('[runTraceDataAnalysis] Analyzing trace data...');
 
-    return this.createTraceDataAnalysis(traceData);
+    this.logger.log('[runTraceDataAnalysis] Fetching trace data...');
+    const traceData = await this.dataSourceClient.fetchTraceData();
+
+    this.logger.log(
+      `[runTraceDataAnalysis] Fetched ${traceData.length} traces, starting analysis...`
+    );
+    const traceDataAnalysis = await this.createTraceDataAnalysis(traceData);
+
+    this.logger.log(
+      `[runTraceDataAnalysis] Analysis finished, checking thresholds...`
+    );
+    const threshHoldOverruns =
+      await this.thresholdService.checkThresholds(traceDataAnalysis);
+
+    if (threshHoldOverruns.length) {
+      this.logger.log(
+        '[runTraceDataAnalysis] Thresholds exceeded, sending email and creating GitHub issue...'
+      );
+      this.emailNotificationService.sendThresholdOverrunEmail(
+        threshHoldOverruns
+      );
+      this.gitClientService.createThresholdOverrunIssue(threshHoldOverruns);
+    } else {
+      this.logger.log('[runTraceDataAnalysis] No thresholds exceeded.');
+    }
+
+    this.logger.log('[runTraceDataAnalysis] Done!');
+
+    return traceDataAnalysis;
   }
 
   public async getTraceDataAnalysis(): Promise<TraceDataAnalysis[]> {
@@ -39,6 +80,7 @@ export class TraceDataAnalysisService {
         'mixedGranulartiyOfTraces.avgScore',
         'precision.avgScore',
         'spanTimeCoverage.avgScore',
+        'spanTimeCoveragePerService',
         'timestampFormat.avgScore',
         'traceBreadth.avgScore',
         'traceDepth.avgScore',
@@ -98,7 +140,6 @@ export class TraceDataAnalysisService {
         this.traceDataMetricsService.calculateInfrequentEventOrdering(
           traceData
         ),
-      // precision: this.traceDataMetricsService.calculatePrecision(traceData),
       missingActivity:
         this.traceDataMetricsService.calculateMissingActivity(traceData),
       missingProperties:

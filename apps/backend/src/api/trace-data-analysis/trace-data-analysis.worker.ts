@@ -25,33 +25,7 @@ export class TraceDataAnalysisWorker {
 
   @Cron('0 * * * *')
   public async runTraceDataAnalysisJob(): Promise<void> {
-    this.logger.log('[runTraceDataAnalysisJob] Fetching trace data...');
-    const traces = await this.dataSourceClient.fetchTraceData();
-
-    this.logger.log(
-      `[runTraceDataAnalysisJob] Fetched ${traces.length} traces, starting analysis...`
-    );
-    const traceDataAnalysis =
-      await this.traceDataAnalysisService.runTraceDataAnalysis(traces);
-
-    this.logger.log(
-      `[runTraceDataAnalysisJob] Analysis finished, checking thresholds...`
-    );
-    const threshHoldOverruns =
-      await this.thresholdService.checkThresholds(traceDataAnalysis);
-
-    if (threshHoldOverruns.length) {
-      this.logger.log(
-        '[runTraceDataAnalysisJob] Thresholds exceeded, sending email and creating GitHub issue...'
-      );
-      this.emailNotificationService.sendThresholdOverrunEmail(
-        threshHoldOverruns
-      );
-      this.gitClientService.createThresholdOverrunIssue(threshHoldOverruns);
-    } else {
-      this.logger.log('[runTraceDataAnalysisJob] No thresholds exceeded.');
-    }
-
-    this.logger.log('[runTraceDataAnalysisJob] Done!');
+    this.logger.log('[runTraceDataAnalysisJob] Analyzing trace data...');
+      this.traceDataAnalysisService.runTraceDataAnalysis()
   }
 }

@@ -104,13 +104,14 @@ export class TraceDataMetricsService {
   }
 
   public calculateSTCPS(traces: Trace[]): Record<string, number> {
+    this.logger.log('[calculateSTCPS] calculate STCPS:');
+
     const serviceScores: Record<string, number> = {};
     let totalTraces = 0;
 
     traces.forEach((trace) => {
       const serviceCoverage = this.calculateSTCPSForSingleTrace(trace);
-      this.logger.log('Service Coverage for Trace:', serviceCoverage);
-
+      this.logger.log('[calculateSTCPS] serviceCoverage', serviceCoverage);
       Object.entries(serviceCoverage).forEach(([serviceName, coverage]) => {
         if (!serviceScores[serviceName]) {
           serviceScores[serviceName] = 0;
@@ -126,7 +127,7 @@ export class TraceDataMetricsService {
       serviceScores[service] = serviceScores[service] / totalTraces;
     });
 
-    this.logger.log('Final Service Scores:', serviceScores);
+    this.logger.log('[calculateSTCPS] Final Service Scores:', serviceScores);
 
     return serviceScores;
   }
@@ -196,8 +197,15 @@ export class TraceDataMetricsService {
     traces.forEach((trace) => {
       let maxDepth = 0;
       const depthMap = new Map<string, number>();
+      let minStartTime = Number.MAX_SAFE_INTEGER;
+      let maxEndTime = Number.MIN_SAFE_INTEGER;
 
       trace.spans.forEach((span) => {
+        const startTime = new Date(span.timestamp).getTime();
+        const endTime = new Date(span.endTimestamp).getTime();
+        minStartTime = Math.min(minStartTime, startTime);
+        maxEndTime = Math.max(maxEndTime, endTime);
+
         const parentDepth = span.parentSpanId
           ? depthMap.get(span.parentSpanId) || 0
           : 0;
@@ -206,7 +214,10 @@ export class TraceDataMetricsService {
         maxDepth = Math.max(maxDepth, currentDepth);
       });
 
-      scores.push({ traceId: trace.id, score: maxDepth });
+      const totalDuration = maxEndTime - minStartTime;
+      const weightedScore = maxDepth * totalDuration;
+
+      scores.push({ traceId: trace.id, score: weightedScore });
     });
 
     const avgDepth =

@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
-import {Text, VStack} from "@chakra-ui/react";
+import { Text, VStack } from '@chakra-ui/react';
 
 export const MetricPieChart = ({
   title,

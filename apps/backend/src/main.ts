@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  app.enableCors();
+  app.enableCors({ credentials: true, origin: env.APP_URL });
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new TypeormExceptionFilter());

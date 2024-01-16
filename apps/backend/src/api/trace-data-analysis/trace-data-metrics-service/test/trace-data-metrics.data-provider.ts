@@ -532,36 +532,39 @@ export const getMissingActivityDataProvider = (): TraceDataProvider[] => {
 };
 
 export const getTraceDepthDataProvider = (): TraceDataProvider[] => {
+  const baseTime = new Date().getTime();
+
   return [
     {
       // Simple trace with no nested spans
       spans: [
-        { spanId: 'a', timestamp: new Date() },
-        { spanId: 'b', timestamp: new Date(), parentSpanId: 'a' },
+        { spanId: 'a', timestamp: new Date(baseTime), endTimestamp: new Date(baseTime + 1000) },
+        { spanId: 'b', timestamp: new Date(baseTime + 100), endTimestamp: new Date(baseTime + 1100), parentSpanId: 'a' },
       ],
-      expectedScore: 2, // Depth of 2 (span 'a' and its child 'b')
+      expectedScore: 2 * 1100, // Depth of 2 * Total Duration (1100 ms)
     },
     {
       // Trace with multiple levels of nesting
       spans: [
-        { spanId: 'a', timestamp: new Date() },
-        { spanId: 'b', timestamp: new Date(), parentSpanId: 'a' },
-        { spanId: 'c', timestamp: new Date(), parentSpanId: 'b' },
+        { spanId: 'a', timestamp: new Date(baseTime), endTimestamp: new Date(baseTime + 1000) },
+        { spanId: 'b', timestamp: new Date(baseTime + 100), endTimestamp: new Date(baseTime + 1100), parentSpanId: 'a' },
+        { spanId: 'c', timestamp: new Date(baseTime + 200), endTimestamp: new Date(baseTime + 1200), parentSpanId: 'b' },
       ],
-      expectedScore: 3, // Depth of 3 (span 'a', 'b', and 'c')
+      expectedScore: 3 * 1200, // Depth of 3 * Total Duration (1200 ms)
     },
     {
       // Trace with multiple branches but same maximum depth
       spans: [
-        { spanId: 'a', timestamp: new Date() },
-        { spanId: 'b', timestamp: new Date(), parentSpanId: 'a' },
-        { spanId: 'c', timestamp: new Date(), parentSpanId: 'a' },
-        { spanId: 'd', timestamp: new Date(), parentSpanId: 'b' },
+        { spanId: 'a', timestamp: new Date(baseTime), endTimestamp: new Date(baseTime + 1000) },
+        { spanId: 'b', timestamp: new Date(baseTime + 100), endTimestamp: new Date(baseTime + 1100), parentSpanId: 'a' },
+        { spanId: 'c', timestamp: new Date(baseTime + 200), endTimestamp: new Date(baseTime + 1200), parentSpanId: 'a' },
+        { spanId: 'd', timestamp: new Date(baseTime + 300), endTimestamp: new Date(baseTime + 1300), parentSpanId: 'b' },
       ],
-      expectedScore: 3, // Depth of 3 (span 'a', 'b', and 'd')
+      expectedScore: 3 * 1300, // Depth of 3 * Total Duration (1300 ms)
     },
   ];
 };
+
 
 export const getTraceBreadthDataProvider = (): TraceDataProvider[] => {
   return [
