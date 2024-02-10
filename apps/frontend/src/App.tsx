@@ -26,7 +26,7 @@ const App = (): JSX.Element => {
           status: 'error',
           description: (
             <UnorderedList>
-              {messages.map((msg) => (
+              {messages?.map((msg) => (
                 <ListItem key={msg}>{msg}</ListItem>
               ))}
             </UnorderedList>
@@ -50,7 +50,7 @@ const App = (): JSX.Element => {
       <VStack gap={8} width="full" height={'full'}>
         <Header />
         <Routes>
-          {routes.map(({ path, component }) => (
+          {routes?.map(({ path, component }) => (
             <Route path={path} element={component} key={`route-${path}`} />
           ))}
           <Route path="*" element={<NotFoundPage />} />

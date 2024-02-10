@@ -21,7 +21,7 @@ export const MetricPieChart = ({
   ];
 
   // Calculate the total percentage covered by the services
-  const totalPercentage = Object.values(data).reduce(
+  const totalPercentage = Object.values(data)?.reduce(
     (acc, value) => acc + value,
     0
   );

@@ -111,7 +111,7 @@ export class TraceDataMetricsService {
 
     traces.forEach((trace) => {
       const serviceCoverage = this.calculateSTCPSForSingleTrace(trace);
-      this.logger.log('[calculateSTCPS] serviceCoverage', serviceCoverage);
+      // this.logger.log('[calculateSTCPS] serviceCoverage', serviceCoverage);
       Object.entries(serviceCoverage).forEach(([serviceName, coverage]) => {
         if (!serviceScores[serviceName]) {
           serviceScores[serviceName] = 0;
@@ -231,7 +231,6 @@ export class TraceDataMetricsService {
 
   public calculateTraceBreadth(traces: Trace[]): TraceScores {
     const scores: TraceScore[] = [];
-
     traces.forEach((trace) => {
       const uniqueServices = new Set<string>();
       trace.spans.forEach((span) => {
@@ -266,9 +265,9 @@ export class TraceDataMetricsService {
     const rootSpanDuration = rootSpanEnd - rootSpanStart || 1;
 
     if (rootSpanDuration === 0) {
-      this.logger.warn(
-        'Root span duration is zero, which may lead to incorrect STCPS calculation.'
-      );
+      // this.logger.warn(
+      //   'Root span duration is zero, which may lead to incorrect STCPS calculation.'
+      // );
 
       return {};
     }
@@ -324,9 +323,9 @@ export class TraceDataMetricsService {
     const STC = (childSpansDuration / rootSpanDuration) * 100;
 
     if (STC > 100) {
-      this.logger.warn(
-        `[calculateSTC] STC exceeds 100% for trace ${trace.id}. This might be due to overlapping spans or incorrect timestamps.`
-      );
+      // this.logger.warn(
+      //   `[calculateSTC] STC exceeds 100% for trace ${trace.id}. This might be due to overlapping spans or incorrect timestamps.`
+      // );
     }
 
     return STC;

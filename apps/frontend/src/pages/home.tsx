@@ -13,6 +13,7 @@ import ServiceInformation from '../components/Chart/ServiceInformation';
 import MetricCard, { metricKeys } from '../components/Chart/MetricCard';
 import { MetricGaugeChart } from '../components/Chart/MetricGaugeChart';
 import { MetricPieChart } from '../components/Chart/MetricPieChart';
+import { ServiceInstrumentationCoverage } from '../components/Chart/ServiceInstrumentationCoverage';
 
 const traceDataProperties: {
   key: string;
@@ -46,7 +47,7 @@ const traceDataProperties: {
   },
   {
     key: 'traceDepth',
-    title: 'Trace Breadth',
+    title: 'Trace Depth',
     isClickable: true,
   },
 ];
@@ -74,11 +75,11 @@ const HomePage = (): ReactElement => {
   return (
     <Box px={16}>
       <HStack wrap={'wrap'} width={'full'} gap={4}>
-        <Box flex={1} width={['1/5']} height={'full'}>
-          <MetricGaugeChart
-            title={'Avg Span Time Coverage'}
-            percentValue={
-              (sortedTraceDataAnalysis?.[0]?.spanTimeCoverage?.avgScore) ?? 0
+        <Box flex={1}>
+          <ServiceInstrumentationCoverage
+            totalNumberOfServices={serviceInfos?.serviceCount ?? 0}
+            data={
+              sortedTraceDataAnalysis?.[0]?.spanTimeCoveragePerService ?? {}
             }
           />
         </Box>
@@ -90,8 +91,16 @@ const HomePage = (): ReactElement => {
             }
           />
         </Box>
+        <Box flex={1} width={['1/5']} height={'full'}>
+          <MetricGaugeChart
+            title={'Avg Span Time Coverage'}
+            percentValue={
+              sortedTraceDataAnalysis?.[0]?.spanTimeCoverage?.avgScore ?? 0
+            }
+          />
+        </Box>
         {traceDataProperties
-          .filter((prop) => prop.key !== 'spanTimeCoverage')
+          ?.filter((prop) => prop.key !== 'spanTimeCoverage')
           .map((prop) => (
             <Box height={'full'} width={['1/5']} flex={1}>
               <MetricCard
@@ -140,7 +149,7 @@ const HomePage = (): ReactElement => {
             <ServiceInformation serviceInfos={serviceInfos} />
           </>
         )}
-        {traceDataProperties.map((prop) => (
+        {traceDataProperties?.map((prop) => (
           <Box w={['full', '49%']}>
             <LineChart
               key={Math.random()}

@@ -77,15 +77,23 @@ export class GithubClientService implements IGitClientService {
     }
   }
 
-  private parseDockerComposeYaml(
-    dockerComposeYaml: string
-  ): DockerComposeAnalysis {
+  private parseDockerComposeYaml(dockerComposeYaml: string): DockerComposeAnalysis {
     const formattedString = parse(dockerComposeYaml);
     const doc = parse(formattedString);
 
     const services = doc?.services ? Object.keys(doc.services) : [];
+    const excludedServices = ['jaeger', 'grafana', 'dataprepper', 'redis-cart', 'ffs_postgres', 'otelcol', 'prometheus', 'opensearch'];
+
     const dockerComposeServices: DockerComposeService[] = services
-      .filter((serviceName) => serviceName.includes('service'))
+      .filter((serviceName) => {
+        // Exclude services with 'test' in the name
+        if (serviceName.toLowerCase().includes('test')) {
+          return false;
+        }
+
+        // Exclude specific services by name
+        return !excludedServices.includes(serviceName.toLowerCase());
+      })
       .map((serviceName) => {
         const service = doc.services[serviceName];
 
@@ -110,4 +118,5 @@ export class GithubClientService implements IGitClientService {
       services: dockerComposeServices,
     };
   }
+
 }

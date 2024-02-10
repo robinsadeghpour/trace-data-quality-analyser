@@ -37,7 +37,7 @@ const MetricChangesTable = ({
           </Thead>
           <Tbody>
             {metricChanges
-              .filter(
+              ?.filter(
                 (m) =>
                   !['_id', 'created_at', 'updated_at', 'timestamp'].includes(
                     m.metric

@@ -585,6 +585,22 @@ export const getTraceBreadthDataProvider = (): TraceDataProvider[] => {
       expectedScore: 2,
     },
     {
+      // Trace with spans from two unique services
+      spans: [
+        {
+          spanId: 'a',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceA' } },
+        },
+        {
+          spanId: 'b',
+          timestamp: new Date(),
+          resource: { service: { name: 'ServiceA' } },
+        },
+      ],
+      expectedScore: 1,
+    },
+    {
       // Trace with spans from three unique services
       spans: [
         {

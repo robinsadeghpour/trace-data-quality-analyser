@@ -52,7 +52,7 @@ export function mapToTraceData(esSource: any): Span {
         instance: {
           id: esSource['Resource.service.instance.id'],
         },
-        name: esSource['Resource.service.name'],
+        name: esSource?.Resource?.service?.name ?? 'Unknown Service',
         namespace: esSource['Resource.service.namespace'],
       },
       telemetry: {

@@ -9,10 +9,10 @@ export class ElasticsearchDataSourceService
   implements IDataSourceClientService
 {
   private readonly client: Client;
-  private readonly index = process.env.ELASTICSEARCH_INDEX || 'trace_index';
+  private readonly index = process.env.ELASTICSEARCH_INDEX;
 
   public constructor() {
-    const node = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
+    const node = process.env.ELASTICSEARCH_URL;
     const auth =
       process.env.ELASTICSEARCH_USERNAME && process.env.ELASTICSEARCH_PASSWORD
         ? {
@@ -29,7 +29,7 @@ export class ElasticsearchDataSourceService
 
   public async fetchTraceData(): Promise<Trace[]> {
     const oneHourAgo = new Date();
-    oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+    oneHourAgo.setMinutes(oneHourAgo.getMinutes() - 1);
 
     const query = {
       query: {

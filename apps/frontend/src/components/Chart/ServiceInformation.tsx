@@ -35,7 +35,7 @@ const ServiceInformation = ({
             </Tr>
           </Thead>
           <Tbody>
-            {serviceInfos.services.map((s, i) => {
+            {serviceInfos.services?.map((s, i) => {
               return (
                 <Tr key={i}>
                   <Td>{s.serviceName}</Td>

@@ -1,15 +1,17 @@
 import React, { ReactElement } from 'react';
 import GaugeChart from 'react-gauge-chart';
-import { VStack, Text, theme } from '@chakra-ui/react';
+import { VStack, Text, theme, HStack } from '@chakra-ui/react';
 
 interface Props {
   title: string;
   percentValue: number;
+  descriptiveValues?: number[];
 }
 
 export const MetricGaugeChart = ({
   title,
   percentValue,
+  descriptiveValues,
 }: Props): ReactElement => {
   return (
     <VStack
@@ -17,6 +19,7 @@ export const MetricGaugeChart = ({
       width={'full'}
       borderRadius={'xl'}
       bgColor={'gray.800'}
+      p={4}
     >
       <Text>{title}</Text>
       <GaugeChart
@@ -28,6 +31,13 @@ export const MetricGaugeChart = ({
           theme.colors.green['500'],
         ]}
       />
+      {descriptiveValues && descriptiveValues.length === 2 && (
+        <HStack width={'full'} justifyContent={'center'}>
+          <Text fontWeight={'bold'}>
+            {descriptiveValues?.[0]} / {descriptiveValues?.[1]}
+          </Text>
+        </HStack>
+      )}
     </VStack>
   );
 };

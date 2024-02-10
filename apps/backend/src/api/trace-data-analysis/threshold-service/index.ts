@@ -40,6 +40,9 @@ export class ThresholdService {
 
     const changes = this.calculateChanges(newData, previousData);
 
+    console.table(changes);
+    console.log('Threshold: ', this.THRESHOLD)
+
     return changes.filter(
       (change) => Math.abs(change.percentageChange) >= this.THRESHOLD
     );

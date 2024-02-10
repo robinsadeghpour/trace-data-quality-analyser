@@ -36,8 +36,8 @@ function LineChart({
   const ref = useRef();
   const navigate = useNavigate();
 
-  const dates = data.map((item) => new Date(item.date).toLocaleDateString());
-  const scores = data.map((item) => item.value);
+  const dates = data?.map((item) => new Date(item.date).toLocaleDateString());
+  const scores = data?.map((item) => item.value);
 
   const chartData = {
     labels: dates,
