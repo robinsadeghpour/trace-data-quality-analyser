@@ -7,6 +7,7 @@
     "landing-page": "nx serve landing-page",
     "start:prod": "node dist/apps/backend/main.js",
     "build": "nx run-many --target=build --projects=backend,frontend, --parallel=true",
+    "build-frontend": "nx run backend:",
     "dev": "nx run-many --target=serve --all=true",
     "gen:theme-typings": "chakra-cli tokens apps/frontend/src/theme.ts"
   },

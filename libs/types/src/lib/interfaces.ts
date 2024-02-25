@@ -99,6 +99,7 @@ export interface TraceDataAnalysis extends Document {
   timestampFormat?: TraceScores;
   // Uniqueness
   duplicatesWithinTrace?: number;
+  instrumentationCoverage?: number;
 }
 
 export interface TraceScores {

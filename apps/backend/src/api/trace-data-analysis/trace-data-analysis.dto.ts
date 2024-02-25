@@ -47,4 +47,7 @@ export class TraceDataAnalysisDto
 
   @ApiPropertyOptional({ type: () => Object })
   public traceDepth: TraceScores;
+
+  @ApiPropertyOptional({ type: () => Number })
+  public instrumentationCoverage: number;
 }
